@@ -15,10 +15,30 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: '*', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use((req, res, next) => {
+  req.socket.setKeepAlive(true);
+  req.socket.setTimeout(0);
+  next();
+});
+
+app.use((req, res, next) => {
+  if (req.path.includes('/api/notificaciones/sse')) {
+    // Saltar compresión para SSE
+    res.set('Content-Encoding', 'identity');
+  }
+  next();
+});
+
 
 // services
 const sseService = new SSEService();
@@ -35,11 +55,20 @@ setInterval(() => {
 
 // Rutas
 app.use('/api/notificaciones', createNotificacionRoutes(notificacionController, sseController));
+app.get('/api/notificaciones/sse/:usuarioId', (req, res) => {
+  sseController.conectar(req, res);
+});
 
 // End point para verificar la salud de la conexión de la API
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
+
+process.on('SIGINT', () => {
+  sseService.cleanup();
+  process.exit(0);
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
