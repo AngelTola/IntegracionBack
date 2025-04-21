@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,111 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum RolDeUsuario {
+  Usuario
+  Arrendador
+}
+
+enum TipoDeNotificacion {
+  ALQUILER_FINALIZADO
+  RESERVA_CANCELADA
+  RESERVA_MODIFICADA
+  VEHICULO_CALIFICADO
+  RESERVA_CONFIRMADA
+  DEPOSITO_CONFIRMADO
+  DEPOSITO_RECIBIDO
+}
+
+enum PrioridadNotificacion {
+  BAJA
+  MEDIA
+  ALTA
+}
+
+enum EstatusRenta {
+  AGENDADA
+  APROBADA
+  DENEGADA
+  EN_CURSO
+  FINALIZADA
+  CANCELADA
+}
+
+enum EstadoAuto {
+  DISPONIBLE
+  OCUPADO
+  EN_MANTENIMIENTO
+}
+
+model Usuario {
+  id              String            @id @default(uuid())
+  rol             RolDeUsuario
+  notificaciones  Notificacion[]  
+  rentas          Renta[]          @relation("UsuarioRentas")
+  autos           Auto[]           @relation("UsuarioAutos")
+}
+
+model Notificacion {
+  id             String                 @id @default(uuid())
+  usuarioId      String                 
+  usuario        Usuario                @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  titulo         String                 @db.VarChar(100)
+  mensaje        String                 @db.Text
+  tipo           TipoDeNotificacion    
+  prioridad      PrioridadNotificacion @default(MEDIA)
+  entidadId      String?               
+  tipoEntidad    String?               @db.VarChar(50) 
+  leido          Boolean               @default(false)
+  leidoEn        DateTime?            
+  creadoEn       DateTime              @default(now())
+  actualizadoEn  DateTime              @updatedAt             
+
+  @@index([usuarioId])                
+  @@index([creadoEn])                 
+  @@index([leido, usuarioId])         
+  @@unique([usuarioId, entidadId, tipo], name: "notificacionUnicaUsuarioEntidad")
+}
+
+model Renta {
+  id                 String       @id @default(uuid())
+  fechaInicio        DateTime
+  fechaFin           DateTime
+  autoId             String
+  clienteId          String
+  estatus            EstatusRenta @default(AGENDADA)
+  fechaSolicitud     DateTime     @default(now())
+  fechaAprobacion    DateTime?
+  montoTotal         Decimal      @db.Decimal(10, 2)
+  kilometrajeInicial Int?
+  kilometrajeFinal   Int?
+  auto               Auto         @relation(fields: [autoId], references: [id], onDelete: Cascade)
+  cliente            Usuario      @relation("UsuarioRentas", fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@unique([clienteId, autoId, fechaInicio], name: "rentaUnicaClienteAutoFecha")
+  @@index([clienteId])
+  @@index([autoId])
+  @@index([fechaInicio])
+}
+
+model Auto {
+  id                String     @id @default(uuid())
+  marca             String
+  modelo            String
+  año               Int
+  placa             String     @unique
+  color             String
+  precioRentaDiario Decimal    @db.Decimal(10, 2)
+  montoGarantia     Decimal    @db.Decimal(10, 2)
+  estado            EstadoAuto @default(DISPONIBLE)
+  fechaAdquisicion  DateTime   @default(now())
+  kilometraje       Int        @default(0)
+  descripcion       String?
+  propietarioId     String
+  imagenes          String?
+  propietario       Usuario    @relation("UsuarioAutos", fields: [propietarioId], references: [id], onDelete: Cascade)
+  rentas            Renta[]
+
+  @@index([propietarioId])
 }
