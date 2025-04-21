@@ -245,7 +245,7 @@ export async function notificarRentaConcluida(rentaId: string): Promise<boolean>
       });
   
       if (notificacionExistente) {
-        console.log(`Ya existe una notificación para la renta ${renta.id}. No se creará una nueva.`);
+        //console.log(`Ya existe una notificación para la renta ${renta.id}. No se creará una nueva.`);
         return false;
       }
   
@@ -261,10 +261,10 @@ export async function notificarRentaConcluida(rentaId: string): Promise<boolean>
         },
       });
   
-      console.log(`Notificación creada para la renta ${renta.id}.`);
+      //console.log(`Notificación creada para la renta ${renta.id}.`);
       return true;
     } else {
-      console.log(`La renta ${rentaId} no ha finalizado aún o no existe.`);
+      //console.log(`La renta ${rentaId} no ha finalizado aún o no existe.`);
       return false;
     }
 }

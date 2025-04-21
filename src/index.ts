@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { SSEService } from './services/sse.service';
 import { NotificacionService } from './services/notificacion.service';
 import { NotificacionController } from './controllers/notificacion.controller';
+import { NotificacionJob } from './jobs/notificacion.job';
 import { SSEController } from './controllers/sse.controller';
 import { createNotificacionRoutes } from './routes/notificacion.routes';
 import { v4 as uuidv4 } from 'uuid';
@@ -63,6 +64,8 @@ app.get('/api/notificaciones/sse/:usuarioId', (req, res) => {
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
+
+NotificacionJob.iniciar();
 
 process.on('SIGINT', () => {
   sseService.cleanup();
