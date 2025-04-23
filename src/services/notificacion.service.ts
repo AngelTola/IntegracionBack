@@ -252,7 +252,7 @@ export async function notificarRentaConcluida(rentaId: string): Promise<boolean>
       await prisma.notificacion.create({
         data: {
           usuarioId: renta.cliente.id,
-          titulo: 'Su Renta ha finalizado',
+          titulo: 'Tiempo de Renta Concluido',
           mensaje: `Se le informa que su renta del vehículo ${renta.auto.modelo} del modelo ${renta.auto.marca} y con placa ${renta.auto.placa} ha concluido, muchas gracias usar nuestro serivcio de renta\natte: REDIBO`,
           tipo: 'ALQUILER_FINALIZADO',
           prioridad: 'MEDIA',
