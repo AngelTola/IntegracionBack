@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { NotificacionController, generarNotificacionRentaConcluida } from '../controllers/notificacion.controller';
+import { NotificacionController, generarNotificacionRentaConcluida, generarNotificacionRentaCancelada } from '../controllers/notificacion.controller';
 import { SSEController } from '../controllers/sse.controller';
 
 export const createNotificacionRoutes = (
@@ -56,7 +56,13 @@ export const createNotificacionRoutes = (
     generarNotificacionRentaConcluida
   );
 
-  // obtener notificaciones para el dropdown (> 4)
+  // generar notificacion de renta cancelada
+  router.post(
+    '/generar-renta-cancelada/:rentaId',
+    generarNotificacionRentaCancelada
+  );
+
+  // obtener notificaciones para el dropdown (> 3)
   router.get(
     '/dropdown-notificaciones/:usuarioId',
     (req, res) => notificacionController.obtenerNotificacionesDropdown(req, res)
