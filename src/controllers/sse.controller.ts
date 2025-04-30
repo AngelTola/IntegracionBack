@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { SSEService } from '../services/sse.service';
-import { v4 as uuidv4 } from 'uuid'; 
 
 export class SSEController {
   private sseService: SSEService;
@@ -10,15 +9,13 @@ export class SSEController {
   }
 
   conectar(req: Request, res: Response): void {
-    const { usuarioId } = req.params;
+    const usuarioId = req.params.usuarioId;
     
     if (!usuarioId) {
       res.status(400).json({ error: 'Se requiere el usuarioId' });
       return;
     }
 
-    const clientId = uuidv4();
-
-    this.sseService.conectarCliente(usuarioId, clientId, req, res);
+    this.sseService.conectarCliente(usuarioId, req, res);
   }
 }

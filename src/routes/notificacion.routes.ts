@@ -1,11 +1,16 @@
 import { Router } from 'express';
 import { NotificacionController, generarNotificacionRentaConcluida, generarNotificacionRentaCancelada } from '../controllers/notificacion.controller';
 import { SSEController } from '../controllers/sse.controller';
+import { SSEService } from '../services/sse.service';
+import { NotificacionService } from '../services/notificacion.service';
 
-export const createNotificacionRoutes = (
-  notificacionController: NotificacionController,
-  sseController: SSEController
-) => {
+// Usar la instancia única del servicio SSE
+const sseService = SSEService.getInstance();
+const notificacionService = new NotificacionService();
+const notificacionController = new NotificacionController(notificacionService);
+const sseController = new SSEController(sseService);
+
+export const createNotificacionRoutes = () => {
   const router = Router();
 
   // Endpoint para conexión SSE

@@ -12,7 +12,7 @@ export class NotificacionJob {
   private static interval: NodeJS.Timeout;
 
   // Instancia única del servicio de notificaciones
-  private static notificacionService = new NotificacionService(new SSEService());
+  private static notificacionService = new NotificacionService();
 
   /** Revisa rentas finalizadas y crea notificaciones */
   private static async revisarRentasFinalizadas() {

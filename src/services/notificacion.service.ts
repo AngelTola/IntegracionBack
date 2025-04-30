@@ -6,8 +6,8 @@ import { SSEService } from './sse.service';
 export class NotificacionService {
     private sseService: SSEService;
 
-    constructor(sseService: SSEService) {
-        this.sseService = sseService;
+    constructor() {
+        this.sseService = SSEService.getInstance();
     }
 
     async crearNotificacion(notificacionData: NotificacionDTO) {
@@ -202,7 +202,7 @@ export class NotificacionService {
                 }
             });
 
-            return { count };
+            return { count, totalNoLeidas: count };
         } catch (error) {
             console.error('Error al obtener conteo de notificaciones:', error);
             throw new Error('No se pudo obtener el conteo de notificaciones');
@@ -227,8 +227,7 @@ export async function obtenerNoLeidas(userId: string) {
  * @param rentaId ID de la renta finalizada
  */
 export async function notificarRentaConcluida(rentaId: string): Promise<boolean> {
-    const sSEService = new SSEService();
-    const notificacionService = new NotificacionService(sSEService);
+    const notificacionService = new NotificacionService();
     
     const renta = await prisma.renta.findUnique({
       where: { id: rentaId },
@@ -262,7 +261,7 @@ export async function notificarRentaConcluida(rentaId: string): Promise<boolean>
         entidadId: renta.id,
         tipoEntidad: 'Renta',
       });
-  
+      
       return true;
     } else {
       return false;
@@ -274,62 +273,66 @@ export async function notificarRentaConcluida(rentaId: string): Promise<boolean>
  * @param rentaId ID de la renta cancelada
  */
 export async function notificarRentaCancelada(rentaId: string): Promise<boolean> {
-    // Instanciamos el servicio de SSE y el servicio de notificaciones
-    const sseService = new SSEService();
-    const notificacionService = new NotificacionService(sseService);
+    const notificacionService = new NotificacionService();
   
-    // Obtenemos la renta con su auto y propietario
-    const renta = await prisma.renta.findUnique({
-      where: { id: rentaId },
-      include: {
-        auto: {
-          include: {
-            propietario: true,
-          },
-        },
-        cliente: true,  // opcional si también quieres notificar al cliente
-      },
-    });
-  
-    if (!renta) {
-      console.error(`La renta ${rentaId} no existe.`);
-      return false;
+    try {
+        const renta = await prisma.renta.findUnique({
+            where: { id: rentaId },
+            include: {
+                auto: {
+                    include: {
+                        propietario: true,
+                    },
+                },
+                cliente: true,
+            },
+        });
+    
+        if (!renta) {
+            console.error(`La renta ${rentaId} no existe.`);
+            return false;
+        }
+    
+        const propietario = renta.auto.propietario;
+        if (!propietario) {
+            console.error(`El vehículo ${renta.auto.id} no tiene propietario asignado.`);
+            return false;
+        }
+
+        console.log(`Enviando notificación de cancelación al propietario: ${propietario.id}`);
+    
+        const notificacionExistente = await prisma.notificacion.findFirst({
+            where: {
+                usuarioId: propietario.id,
+                entidadId: renta.id,
+                tipo: 'RESERVA_CANCELADA',
+            },
+        });
+
+        if (notificacionExistente) {
+            console.log(`Ya existe una notificación de cancelación para la renta ${rentaId}`);
+            return false;
+        }
+    
+        const mensaje = 
+            `Se le informa que la renta del vehículo ${renta.auto.modelo} ` +
+            `(${renta.auto.marca}, placa ${renta.auto.placa}) ha sido cancelada.\n` +
+            `Atte: REDIBO`;
+    
+        const notificacion = await notificacionService.crearNotificacion({
+            usuarioId: propietario.id,
+            titulo: 'Cancelación de Renta',
+            mensaje,
+            tipo: 'RESERVA_CANCELADA',
+            prioridad: 'ALTA',
+            entidadId: renta.id,
+            tipoEntidad: 'Renta',
+        });
+
+        console.log(`Notificación creada exitosamente para el usuario ${propietario.id}`);
+        return true;
+    } catch (error) {
+        console.error('Error al notificar renta cancelada:', error);
+        return false;
     }
-  
-    const propietario = renta.auto.propietario;
-    if (!propietario) {
-      console.error(`El vehículo ${renta.auto.id} no tiene propietario asignado.`);
-      return false;
-    }
-  
-    // Verificamos si ya existe la notificación de cancelación
-    const notificacionExistente = await prisma.notificacion.findFirst({
-      where: {
-        usuarioId: propietario.id,
-        entidadId: renta.id,
-        tipo: 'RESERVA_CANCELADA',
-      },
-    });
-    if (notificacionExistente) {
-      return false;
-    }
-  
-    // Construimos el mensaje de notificación
-    const mensaje = 
-      `Se le informa que la renta del vehículo ${renta.auto.modelo} ` +
-      `(${renta.auto.marca}, placa ${renta.auto.placa}) ha sido cancelada.\n` +
-      `Atte: REDIBO`;
-  
-    // Creamos la notificación a través del servicio
-    await notificacionService.crearNotificacion({
-      usuarioId: propietario.id,
-      titulo: 'Cancelación de Renta',
-      mensaje,
-      tipo: 'RESERVA_CANCELADA',
-      prioridad: 'ALTA',
-      entidadId: renta.id,
-      tipoEntidad: 'Renta',
-    });
-  
-    return true;
-  }
+}

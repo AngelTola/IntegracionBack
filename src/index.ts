@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middlewares
 app.use(cors({
@@ -40,10 +40,9 @@ app.use((req, res, next) => {
   next();
 });
 
-
-// services
-const sseService = new SSEService();
-const notificacionService = new NotificacionService(sseService);
+// Usar la instancia única del servicio SSE
+const sseService = SSEService.getInstance();
+const notificacionService = new NotificacionService();
 
 // controllers
 const notificacionController = new NotificacionController(notificacionService);
@@ -67,11 +66,11 @@ app.get('/health', (req, res) => {
 
 NotificacionJob.iniciar();
 
-process.on('SIGINT', () => {
+process.on('SIGTERM', () => {
+  console.log('Cerrando servidor...');
   sseService.cleanup();
   process.exit(0);
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
