@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { NotificacionController, generarNotificacionRentaConcluida, generarNotificacionRentaCancelada } from '../controllers/notificacion.controller';
+import { NotificacionController, generarNotificacionRentaConcluida, generarNotificacionRentaCancelada, generarNotificacionNuevaCalificacion } from '../controllers/notificacion.controller';
 import { SSEController } from '../controllers/sse.controller';
 import { SSEService } from '../services/sse.service';
 import { NotificacionService } from '../services/notificacion.service';
@@ -65,6 +65,12 @@ export const createNotificacionRoutes = () => {
   router.post(
     '/generar-renta-cancelada/:rentaId',
     generarNotificacionRentaCancelada
+  );
+
+  // generar notificación de nueva calificación para un vehículo
+  router.post(
+    '/generar-notificacion-calificacion/:rentaId', 
+    generarNotificacionNuevaCalificacion
   );
 
   // obtener notificaciones para el dropdown (> 3)

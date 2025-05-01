@@ -20,6 +20,7 @@ enum TipoDeNotificacion {
   RESERVA_CONFIRMADA
   DEPOSITO_CONFIRMADO
   DEPOSITO_RECIBIDO
+  NUEVA_CALIFICACION
 }
 
 enum PrioridadNotificacion {
@@ -73,19 +74,20 @@ model Notificacion {
 }
 
 model Renta {
-  id                 String       @id @default(uuid())
+  id                 String        @id @default(uuid())
   fechaInicio        DateTime
   fechaFin           DateTime
   autoId             String
   clienteId          String
-  estatus            EstatusRenta @default(AGENDADA)
-  fechaSolicitud     DateTime     @default(now())
+  estatus            EstatusRenta  @default(AGENDADA)
+  fechaSolicitud     DateTime      @default(now())
   fechaAprobacion    DateTime?
-  montoTotal         Decimal      @db.Decimal(10, 2)
+  montoTotal         Decimal       @db.Decimal(10, 2)
   kilometrajeInicial Int?
   kilometrajeFinal   Int?
-  auto               Auto         @relation(fields: [autoId], references: [id], onDelete: Cascade)
-  cliente            Usuario      @relation("UsuarioRentas", fields: [clienteId], references: [id], onDelete: Cascade)
+  auto               Auto          @relation(fields: [autoId], references: [id], onDelete: Cascade)
+  cliente            Usuario       @relation("UsuarioRentas", fields: [clienteId], references: [id], onDelete: Cascade)
+  calificacion       Calificacion? 
 
   @@unique([clienteId, autoId, fechaInicio], name: "rentaUnicaClienteAutoFecha")
   @@index([clienteId])
@@ -112,4 +114,16 @@ model Auto {
   rentas            Renta[]
 
   @@index([propietarioId])
+}
+
+model Calificacion {
+  id            String   @id @default(uuid())
+  puntuacion    Int      @db.SmallInt
+  comentario    String?  @db.Text
+  rentaId       String   @unique 
+  fechaCreacion DateTime @default(now())
+  
+  renta         Renta    @relation(fields: [rentaId], references: [id], onDelete: Cascade)
+
+  @@index([rentaId])
 }

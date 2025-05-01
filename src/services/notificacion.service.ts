@@ -336,3 +336,88 @@ export async function notificarRentaCancelada(rentaId: string): Promise<boolean>
         return false;
     }
 }
+
+/**
+ * Genera una notificación cuando un vehículo recibe una calificación o comentario.
+ * @param calificacionId ID de la calificación realizada
+ */
+export async function notificarNuevaCalificacion(rentaId: string): Promise<boolean> {
+    const notificacionService = new NotificacionService();
+  
+    try {
+        // Obtener la calificación por rentaId en lugar de id
+        const calificacion = await prisma.calificacion.findUnique({
+            where: { rentaId: rentaId },
+            include: {
+                renta: {
+                    include: {
+                        auto: {
+                            include: {
+                                propietario: true
+                            }
+                        },
+                        cliente: true
+                    }
+                }
+            }
+        });
+    
+        if (!calificacion) {
+            console.error(`No existe calificación para la renta ${rentaId}.`);
+            return false;
+        }
+    
+        const propietario = calificacion.renta.auto.propietario;
+        if (!propietario) {
+            console.error(`El vehículo ${calificacion.renta.auto.id} no tiene propietario asignado.`);
+            return false;
+        }
+
+        console.log(`Enviando notificación de nueva calificación al propietario: ${propietario.id}`);
+    
+        // Verificar si ya existe una notificación para esta calificación
+        const notificacionExistente = await prisma.notificacion.findFirst({
+            where: {
+                usuarioId: propietario.id,
+                entidadId: calificacion.id, // Usamos el id de la calificación
+                tipo: 'NUEVA_CALIFICACION',
+            },
+        });
+
+        if (notificacionExistente) {
+            console.log(`Ya existe una notificación para la calificación ${calificacion.id}`);
+            return false;
+        }
+    
+        // Crear el mensaje de la notificación
+        let mensaje = `Su vehículo ${calificacion.renta.auto.modelo} ` +
+            `(${calificacion.renta.auto.marca}, placa ${calificacion.renta.auto.placa}) ha recibido ` +
+            `una calificación de ${calificacion.puntuacion} estrellas`;
+        
+        if (calificacion.comentario) {
+            mensaje += ` con el siguiente comentario: "${calificacion.comentario}"\n`;
+        } else {
+            mensaje += ".\n";
+        }
+        
+        mensaje += `Calificado por: ${calificacion.renta.cliente.nombre} ${calificacion.renta.cliente.apellido}\n` +
+            `Atte: REDIBO`;
+    
+        // Crear la notificación
+        const notificacion = await notificacionService.crearNotificacion({
+            usuarioId: propietario.id,
+            titulo: 'Nueva Calificación Recibida',
+            mensaje,
+            tipo: 'NUEVA_CALIFICACION',
+            prioridad: 'MEDIA',
+            entidadId: calificacion.id, // Usamos el id de la calificación
+            tipoEntidad: 'Calificacion',
+        });
+
+        console.log(`Notificación de calificación creada exitosamente para el usuario ${propietario.id}`);
+        return true;
+    } catch (error) {
+        console.error('Error al notificar nueva calificación:', error);
+        return false;
+    }
+}

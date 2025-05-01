@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { NotificacionService, notificarRentaConcluida, notificarRentaCancelada } from '../services/notificacion.service';
+import { NotificacionService, notificarRentaConcluida, notificarRentaCancelada, notificarNuevaCalificacion } from '../services/notificacion.service';
 import { TipoDeNotificacion, PrioridadNotificacion } from '@prisma/client';
 
 
@@ -169,5 +169,24 @@ export async function generarNotificacionRentaCancelada(req: Request, res: Respo
     }
   } catch (error) {
     res.status(500).json({ error: 'Error al generar la notificación.' });
+  }
+}
+
+/**
+ * Endpoint para generar notificación de nueva calificación
+ */
+export async function generarNotificacionNuevaCalificacion(req: Request, res: Response) {
+  const { rentaId } = req.params;  // Cambiado de calificacionId a rentaId
+  try {
+    const creada = await notificarNuevaCalificacion(rentaId);
+    
+    if (creada) {
+      res.json({ message: 'Notificación de calificación generada correctamente.' });
+    } else {
+      res.json({ message: 'La notificación ya existía o no se encontró la calificación.' });
+    }
+  } catch (error) {
+    console.error('Error al generar notificación de calificación:', error);
+    res.status(500).json({ error: 'Error al generar la notificación de calificación.' });
   }
 }
