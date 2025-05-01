@@ -14,6 +14,7 @@ enum RolDeUsuario {
 
 enum TipoDeNotificacion {
   ALQUILER_FINALIZADO
+  ALQUILER_CANCELADO
   RESERVA_CANCELADA
   RESERVA_MODIFICADA
   VEHICULO_CALIFICADO
@@ -30,11 +31,17 @@ enum PrioridadNotificacion {
 }
 
 enum EstatusRenta {
-  AGENDADA
-  APROBADA
-  DENEGADA
   EN_CURSO
   FINALIZADA
+  CANCELADA
+}
+
+enum EstadoReserva {
+  SOLICITADA
+  APROBADA
+  CONFIRMADA
+  ENTREGADA
+  RECHAZADA
   CANCELADA
 }
 
@@ -45,54 +52,54 @@ enum EstadoAuto {
 }
 
 model Usuario {
-  id              String            @id @default(uuid())
-  rol             RolDeUsuario
-  notificaciones  Notificacion[]  
-  rentas          Renta[]          @relation("UsuarioRentas")
-  autos           Auto[]           @relation("UsuarioAutos")
+  id             String         @id @default(uuid())
+  nombre         String
+  apellido       String
+  rol            RolDeUsuario
+  notificaciones Notificacion[]
+  rentas         Renta[]        @relation("UsuarioRentas")
+  reservas       Reserva[]      @relation("UsuarioReservas")
+  autos          Auto[]         @relation("UsuarioAutos")
 }
 
 model Notificacion {
-  id             String                 @id @default(uuid())
-  usuarioId      String                 
-  usuario        Usuario                @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  titulo         String                 @db.VarChar(100)
-  mensaje        String                 @db.Text
-  tipo           TipoDeNotificacion    
-  prioridad      PrioridadNotificacion @default(MEDIA)
-  entidadId      String?               
-  tipoEntidad    String?               @db.VarChar(50) 
-  leido          Boolean               @default(false)
-  leidoEn        DateTime?            
-  creadoEn       DateTime              @default(now())
-  actualizadoEn  DateTime              @updatedAt             
+  id            String                @id @default(uuid())
+  usuarioId     String
+  usuario       Usuario               @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  titulo        String                @db.VarChar(100)
+  mensaje       String                @db.Text
+  tipo          TipoDeNotificacion
+  prioridad     PrioridadNotificacion @default(MEDIA)
+  entidadId     String?
+  tipoEntidad   String?               @db.VarChar(50)
+  leido         Boolean               @default(false)
+  leidoEn       DateTime?
+  creadoEn      DateTime              @default(now())
+  actualizadoEn DateTime              @updatedAt
 
-  @@index([usuarioId])                
-  @@index([creadoEn])                 
-  @@index([leido, usuarioId])         
-  @@unique([usuarioId, entidadId, tipo], name: "notificacionUnicaUsuarioEntidad")
+  @@index([usuarioId])
+  @@index([creadoEn])
+  @@index([leido, usuarioId])
 }
 
 model Renta {
-  id                 String        @id @default(uuid())
+  id                 String      @id @default(uuid())
   fechaInicio        DateTime
   fechaFin           DateTime
-  autoId             String
-  clienteId          String
-  estatus            EstatusRenta  @default(AGENDADA)
-  fechaSolicitud     DateTime      @default(now())
-  fechaAprobacion    DateTime?
-  montoTotal         Decimal       @db.Decimal(10, 2)
+  montoTotal         Decimal     @db.Decimal(10, 2)
   kilometrajeInicial Int?
   kilometrajeFinal   Int?
-  auto               Auto          @relation(fields: [autoId], references: [id], onDelete: Cascade)
-  cliente            Usuario       @relation("UsuarioRentas", fields: [clienteId], references: [id], onDelete: Cascade)
-  calificacion       Calificacion? 
+  estatus            EstatusRenta @default(EN_CURSO)
+  fechaAprobacion    DateTime
+  reservaId          String      @unique
+  reserva            Reserva     @relation(fields: [reservaId], references: [idReserva], onDelete: Cascade)
+  clienteId          String
+  cliente            Usuario     @relation("UsuarioRentas", fields: [clienteId], references: [id], onDelete: Cascade)
+  autoId             String
+  auto               Auto        @relation("AutoRentas", fields: [autoId], references: [id], onDelete: Cascade)
+  calificacion       Calificacion?
 
-  @@unique([clienteId, autoId, fechaInicio], name: "rentaUnicaClienteAutoFecha")
-  @@index([clienteId])
-  @@index([autoId])
-  @@index([fechaInicio])
+  @@index([reservaId])
 }
 
 model Auto {
@@ -111,9 +118,29 @@ model Auto {
   propietarioId     String
   imagenes          String?
   propietario       Usuario    @relation("UsuarioAutos", fields: [propietarioId], references: [id], onDelete: Cascade)
-  rentas            Renta[]
+  reservas          Reserva[]
+  rentas            Renta[]    @relation("AutoRentas")
+}
 
-  @@index([propietarioId])
+model Reserva {
+  idReserva       String        @id @default(uuid())
+  fechaInicio     DateTime
+  fechaFin        DateTime
+  autoId          String
+  auto            Auto          @relation(fields: [autoId], references: [id], onDelete: Cascade)
+  idCliente       String
+  cliente         Usuario       @relation("UsuarioReservas", fields: [idCliente], references: [id], onDelete: Cascade)
+  estado          EstadoReserva @default(SOLICITADA)
+  fechaSolicitud  DateTime      @default(now())
+  fechaLimitePago DateTime
+  montoTotal      Decimal       @db.Decimal(10, 2)
+  estaPagada      Boolean       @default(false)
+  renta           Renta?
+
+  @@unique([idCliente, autoId, fechaInicio], name: "reservaUnicaClienteAutoFecha")
+  @@index([idCliente])
+  @@index([autoId])
+  @@index([fechaInicio])
 }
 
 model Calificacion {

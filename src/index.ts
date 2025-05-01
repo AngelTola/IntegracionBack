@@ -8,6 +8,9 @@ import { NotificacionController } from './controllers/notificacion.controller';
 import { NotificacionJob } from './jobs/notificacion.job';
 import { SSEController } from './controllers/sse.controller';
 import { createNotificacionRoutes } from './routes/notificacion.routes';
+import { ReservaService } from './services/reserva.service';
+import { ReservaController } from './controllers/reserva.controller';
+import { createReservaRoutes } from './routes/reserva.routes';
 import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
@@ -43,10 +46,12 @@ app.use((req, res, next) => {
 // Usar la instancia única del servicio SSE
 const sseService = SSEService.getInstance();
 const notificacionService = new NotificacionService();
+const reservaService = new ReservaService(notificacionService);
 
 // controllers
 const notificacionController = new NotificacionController(notificacionService);
 const sseController = new SSEController(sseService);
+const reservaController = new ReservaController(reservaService);
 
 // Configurar ping periódico para el SSE
 setInterval(() => {
@@ -54,7 +59,8 @@ setInterval(() => {
 }, 30000); // 30 segundos
 
 // Rutas
-app.use('/api/notificaciones', createNotificacionRoutes(notificacionController, sseController));
+app.use('/api/notificaciones', createNotificacionRoutes());
+app.use('/api/reservas', createReservaRoutes(reservaController, sseController));
 app.get('/api/notificaciones/sse/:usuarioId', (req, res) => {
   sseController.conectar(req, res);
 });

@@ -16,54 +16,27 @@ export class NotificacionService {
                 ...notificacionData,
                 prioridad: notificacionData.prioridad || PrioridadNotificacion.MEDIA,
             };
-
-            if (notificacionData.entidadId && notificacionData.tipo) {
-                const existente = await prisma.notificacion.findFirst({
-                    where: {
-                        usuarioId: notificacionData.usuarioId,
-                        entidadId: notificacionData.entidadId,
-                        tipo: notificacionData.tipo
-                    }
-                });
-
-                if (existente) {
-                    const actualizada = await prisma.notificacion.update({
-                        where: { id: existente.id },
-                        data: {
-                            titulo: data.titulo,
-                            mensaje: data.mensaje,
-                            prioridad: data.prioridad,
-                            leido: false,
-                            leidoEn: null,
-                        }
-                    });
-
-                    this.sseService.enviarNotificacion({
-                        evento: 'NUEVA_NOTIFICACION',
-                        data: actualizada,
-                        usuarioId: notificacionData.usuarioId
-                    });
-
-                    return actualizada;
-                }
-            }
-
+    
             const nuevaNotificacion = await prisma.notificacion.create({
                 data
             });
-
-            this.sseService.enviarNotificacion({
-                evento: 'NUEVA_NOTIFICACION',
-                data: nuevaNotificacion,
-                usuarioId: notificacionData.usuarioId
-            });
-
+    
+            try {
+                await this.sseService.enviarNotificacion({
+                    evento: 'NUEVA_NOTIFICACION',
+                    data: nuevaNotificacion,
+                    usuarioId: notificacionData.usuarioId
+                });
+            } catch (sseError) {
+                console.error('Error al enviar notificación via SSE:', sseError);
+            }
+    
             return nuevaNotificacion;
         } catch (error) {
             console.error('Error al crear notificación:', error);
             throw new Error('No se pudo crear la notificación');
         }
-    }
+    }    
 
     async obtenerNotificaciones(filtros: NotificacionFiltro) {
         try {
