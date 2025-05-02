@@ -134,6 +134,7 @@ model Reserva {
   fechaSolicitud  DateTime      @default(now())
   fechaLimitePago DateTime
   montoTotal      Decimal       @db.Decimal(10, 2)
+  montoPagado     Decimal       @default(0.00) @db.Decimal(10, 2)
   estaPagada      Boolean       @default(false)
   renta           Renta?
 

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { NotificacionController, generarNotificacionRentaConcluida, generarNotificacionRentaCancelada, generarNotificacionNuevaCalificacion } from '../controllers/notificacion.controller';
+import { NotificacionController, generarNotificacionRentaConcluida, generarNotificacionRentaCancelada, generarNotificacionNuevaCalificacion, generarNotificacionReservaConfirmada } from '../controllers/notificacion.controller';
 import { SSEController } from '../controllers/sse.controller';
 import { SSEService } from '../services/sse.service';
 import { NotificacionService } from '../services/notificacion.service';
@@ -71,6 +71,11 @@ export const createNotificacionRoutes = () => {
   router.post(
     '/generar-notificacion-calificacion/:rentaId', 
     generarNotificacionNuevaCalificacion
+  );
+
+  router.post(
+    '/generar-reserva-confirmada/:reservaId',
+    generarNotificacionReservaConfirmada
   );
 
   // obtener notificaciones para el dropdown (> 3)

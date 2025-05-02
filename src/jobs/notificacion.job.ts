@@ -2,13 +2,15 @@ import prisma from '../config/database';
 import {
   notificarRentaConcluida,
   notificarRentaCancelada,
-  NotificacionService,
+  notificarReservaConfirmada,
+  NotificacionService
 } from '../services/notificacion.service';
 import { SSEService } from '../services/sse.service';
 
 export class NotificacionJob {
   private static ejecucionFinalizadas = false;
   private static ejecucionCanceladas = false;
+  private static ejecucionConfirmadas = false;
   private static interval: NodeJS.Timeout;
 
   // Instancia única del servicio de notificaciones
@@ -95,11 +97,55 @@ export class NotificacionJob {
     }
   }
 
+  /** Revisa reservas confirmadas y crea notificaciones */
+  private static async revisarReservasConfirmadas() {
+    if (NotificacionJob.ejecucionConfirmadas) {
+      console.log('Reservas Confirmadas: ejecución en curso, se omite esta ronda.');
+      return;
+    }
+    NotificacionJob.ejecucionConfirmadas = true;
+
+    try {
+      const reservasConfirmadas = await prisma.reserva.findMany({
+        where: {
+          estado: 'CONFIRMADA',
+        },
+        include: {
+          cliente: {
+            include: {
+              notificaciones: {
+                where: {
+                  tipo: 'RESERVA_CONFIRMADA',
+                  leido: false,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // Filtrar las reservas que no han sido notificadas
+      const sinNotificar = reservasConfirmadas.filter(
+        (r) => r.cliente.notificaciones.length === 0
+      );
+
+      // Crear la notificación para las reservas no notificadas
+      for (const reserva of sinNotificar) {
+        await notificarReservaConfirmada(reserva.idReserva);
+      }
+    } catch (error) {
+      console.error('Error revisando reservas confirmadas:', error);
+    } finally {
+      NotificacionJob.ejecucionConfirmadas = false;
+    }
+  }
+
   /** Inicia el cron job que periódicamente revisa ambas listas */
   public static iniciar() {
     this.interval = setInterval(() => {
       NotificacionJob.revisarRentasFinalizadas();
       NotificacionJob.revisarRentasCanceladas();
+      NotificacionJob.revisarReservasConfirmadas();
     }, 2000); // cada 2 segundos
   }
 

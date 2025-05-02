@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { NotificacionService, notificarRentaConcluida, notificarRentaCancelada, notificarNuevaCalificacion } from '../services/notificacion.service';
+import { NotificacionService, notificarRentaConcluida, notificarRentaCancelada, notificarNuevaCalificacion, notificarReservaConfirmada } from '../services/notificacion.service';
 import { TipoDeNotificacion, PrioridadNotificacion } from '@prisma/client';
 
 
@@ -190,3 +190,23 @@ export async function generarNotificacionNuevaCalificacion(req: Request, res: Re
     res.status(500).json({ error: 'Error al generar la notificación de calificación.' });
   }
 }
+
+/**
+ * Endpoint para generar notificación de reserva confirmada
+ */
+export async function generarNotificacionReservaConfirmada(req: Request, res: Response) {
+  const { reservaId } = req.params;
+  try {
+    const creada = await notificarReservaConfirmada(reservaId);
+
+    if (creada) {
+      res.json({ message: 'Notificación generada correctamente.' });
+    } else {
+      res.json({ message: 'La notificación ya existía o la reserva no está confirmada.' });
+    }
+  } catch (error) {
+    console.error('Error al generar la notificación de reserva confirmada:', error);
+    res.status(500).json({ error: 'Error al generar la notificación de reserva confirmada.' });
+  }
+}
+

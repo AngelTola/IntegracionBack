@@ -394,3 +394,74 @@ export async function notificarNuevaCalificacion(rentaId: string): Promise<boole
         return false;
     }
 }
+
+/**
+ * Genera una notificación cuando una reserva ha sido confirmada (parcial o totalmente).
+ * @param reservaId ID de la reserva confirmada
+ */
+export async function notificarReservaConfirmada(reservaId: string): Promise<boolean> {
+    const notificacionService = new NotificacionService();
+
+    try {
+        const reserva = await prisma.reserva.findUnique({
+            where: { idReserva: reservaId },
+            include: {
+                cliente: true,
+                auto: true,
+            }
+        });
+
+        if (!reserva) {
+            console.error(`Reserva ${reservaId} no encontrada.`);
+            return false;
+        }
+
+        if (reserva.estado !== 'CONFIRMADA') {
+            console.log(`La reserva ${reservaId} no está confirmada, estado actual: ${reserva.estado}`);
+            return false;
+        }
+
+        const notificacionExistente = await prisma.notificacion.findFirst({
+            where: {
+                usuarioId: reserva.idCliente,
+                entidadId: reserva.idReserva,
+                tipo: 'RESERVA_CONFIRMADA',
+            },
+        });
+
+        if (notificacionExistente) {
+            console.log(`Ya existe una notificación de confirmación para la reserva ${reservaId}`);
+            return false;
+        }
+
+        const montoPagado = reserva.estaPagada && reserva.montoPagado == reserva.montoTotal? "100%" : `50% con un monto de ${reserva.montoPagado}`;
+
+        let mensaje = `Su reserva del vehículo ${reserva.auto.modelo} ${reserva.auto.marca}, con placa ${reserva.auto.placa} ` +
+                      `ha sido confirmada con un pago del ${montoPagado}.`;
+
+        if (!reserva.estaPagada && reserva.fechaLimitePago) {
+            const fechaLimite = new Date(reserva.fechaLimitePago).toLocaleString();
+            const diferenciaPago = reserva.montoTotal.sub(reserva.montoPagado);
+            mensaje += ` Debe completar el pago restante de ${diferenciaPago} antes del ${fechaLimite} `;
+        }
+
+        mensaje += `\nAtte: REDIBO`;
+
+        await notificacionService.crearNotificacion({
+            usuarioId: reserva.idCliente,
+            titulo: 'Reserva Confirmada',
+            mensaje,
+            tipo: 'RESERVA_CONFIRMADA',
+            prioridad: 'ALTA',
+            entidadId: reserva.idReserva,
+            tipoEntidad: 'Reserva',
+        });
+
+        console.log(`Notificación de reserva confirmada enviada a usuario ${reserva.idCliente}`);
+        return true;
+
+    } catch (error) {
+        console.error('Error al notificar reserva confirmada:', error);
+        return false;
+    }
+}
