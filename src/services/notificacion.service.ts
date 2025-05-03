@@ -397,7 +397,7 @@ export async function notificarRentaCancelada(rentaId: string): Promise<boolean>
             return false;
         }
 
-        console.log(`Enviando notificación de cancelación al propietario: ${propietario.id}`);
+        //console.log(`Enviando notificación de cancelación al propietario: ${propietario.id}`);
     
         const notificacionExistente = await prisma.notificacion.findFirst({
             where: {
@@ -408,7 +408,7 @@ export async function notificarRentaCancelada(rentaId: string): Promise<boolean>
         });
 
         if (notificacionExistente) {
-            console.log(`Ya existe una notificación de cancelación para la renta ${rentaId}`);
+            //console.log(`Ya existe una notificación de cancelación para la renta ${rentaId}`);
             return false;
         }
     
@@ -555,11 +555,11 @@ export async function notificarReservaConfirmada(reservaId: string): Promise<boo
         });
 
         if (notificacionExistente) {
-            console.log(`Ya existe una notificación de confirmación para la reserva ${reservaId}`);
+            //console.log(`Ya existe una notificación de confirmación para la reserva ${reservaId}`);
             return false;
         }
 
-        const montoPagado = reserva.estaPagada && reserva.montoPagado == reserva.montoTotal? "100%" : `50% con un monto de ${reserva.montoPagado}`;
+        const montoPagado = reserva.montoPagado.equals(reserva.montoTotal)? `100%` : `50% con un monto de ${reserva.montoPagado}`;
 
         let mensaje = `Su reserva del vehículo ${reserva.auto.modelo} ${reserva.auto.marca}, con placa ${reserva.auto.placa} ` +
                       `ha sido confirmada con un pago del ${montoPagado}.`;
