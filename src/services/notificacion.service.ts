@@ -478,7 +478,7 @@ export async function notificarNuevaCalificacion(rentaId: string): Promise<boole
             where: {
                 usuarioId: propietario.id,
                 entidadId: calificacion.id, // Usamos el id de la calificación
-                tipo: 'NUEVA_CALIFICACION',
+                tipo: 'VEHICULO_CALIFICADO',
             },
         });
 
@@ -506,7 +506,7 @@ export async function notificarNuevaCalificacion(rentaId: string): Promise<boole
             usuarioId: propietario.id,
             titulo: 'Nueva Calificación Recibida',
             mensaje,
-            tipo: 'NUEVA_CALIFICACION',
+            tipo: 'VEHICULO_CALIFICADO',
             prioridad: 'MEDIA',
             entidadId: calificacion.id, // Usamos el id de la calificación
             tipoEntidad: 'Calificacion',
