@@ -504,7 +504,7 @@ export async function notificarNuevaCalificacion(rentaId: string): Promise<boole
         // Crear la notificación
         const notificacion = await notificacionService.crearNotificacion({
             usuarioId: propietario.id,
-            titulo: 'Nueva Calificación Recibida',
+            titulo: 'Calificación Recibida',
             mensaje,
             tipo: 'VEHICULO_CALIFICADO',
             prioridad: 'MEDIA',
