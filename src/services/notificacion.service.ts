@@ -419,7 +419,7 @@ export async function notificarRentaCancelada(rentaId: string): Promise<boolean>
     
         const notificacion = await notificacionService.crearNotificacion({
             usuarioId: propietario.id,
-            titulo: 'Cancelación de Renta',
+            titulo: 'Renta Cancelada',
             mensaje,
             tipo: 'RESERVA_CANCELADA',
             prioridad: 'ALTA',
