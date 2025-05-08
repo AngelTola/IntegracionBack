@@ -43,7 +43,8 @@ export class ReservaService {
     const notificacionData: NotificacionDTO = {
       usuarioId: reservaActualizada.auto.propietarioId,
       titulo: 'Reserva Modificada',
-      mensaje: `El estado de la reserva para su vehículo ${reservaActualizada.auto.marca} ${reservaActualizada.auto.modelo} ha cambiado de ${estadoAnterior} a ${nuevoEstado}.`,
+      mensaje: `El estado de la reserva para su vehículo ${reservaActualizada.auto.marca} ${reservaActualizada.auto.modelo} 
+      con placa ${reservaActualizada.auto.placa} ha cambiado de estado ${estadoAnterior} a este nuevo estado ${nuevoEstado}.`,
       tipo: TipoDeNotificacion.RESERVA_MODIFICADA,
       prioridad: 'MEDIA',
       entidadId: reservaActualizada.idReserva,
