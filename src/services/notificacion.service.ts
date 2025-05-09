@@ -560,14 +560,22 @@ export async function notificarReservaConfirmada(reservaId: string): Promise<boo
         }
 
         const montoPagado = reserva.montoPagado.equals(reserva.montoTotal)? `100%` : `50% con un monto de ${reserva.montoPagado}`;
+        const formatDate = new Intl.DateTimeFormat('es-ES', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
 
         let mensaje = `Su reserva del vehículo ${reserva.auto.modelo} ${reserva.auto.marca}, con placa ${reserva.auto.placa} ` +
                       `ha sido confirmada con un pago del ${montoPagado}.`;
 
         if (!reserva.estaPagada && reserva.fechaLimitePago) {
-            const fechaLimite = new Date(reserva.fechaLimitePago).toLocaleString();
+            const fechaLimite = formatDate.format(new Date(reserva.fechaLimitePago));
             const diferenciaPago = reserva.montoTotal.sub(reserva.montoPagado);
-            mensaje += ` Debe completar el pago restante de ${diferenciaPago} antes del ${fechaLimite}`;
+            mensaje += ` Debe completar el pago restante de ${diferenciaPago} antes del <strong>${fechaLimite}</strong>`;
         }
 
         mensaje += `\nAtte: REDIBO`;
