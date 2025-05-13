@@ -546,19 +546,10 @@ export async function notificarReservaConfirmada(reservaId: string): Promise<boo
     try {
         const reserva = await prisma.reserva.findUnique({
             where: { idReserva: reservaId },
-            include: {
-                cliente: true,
-                auto: true,
-            }
+            include: { cliente: true, auto: true }
         });
 
-        if (!reserva) {
-            console.error(`Reserva ${reservaId} no encontrada.`);
-            return false;
-        }
-
-        if (reserva.estado !== 'CONFIRMADA') {
-            console.log(`La reserva ${reservaId} no está confirmada, estado actual: ${reserva.estado}`);
+        if (!reserva || reserva.estado !== 'CONFIRMADA') {
             return false;
         }
 
@@ -568,32 +559,19 @@ export async function notificarReservaConfirmada(reservaId: string): Promise<boo
                 entidadId: reserva.idReserva,
                 tipo: 'RESERVA_CONFIRMADA',
                 haSidoBorrada: false
-            },
+            }
         });
 
-       if (notificacionExistente) {
-            return false;
-        }
+        if (notificacionExistente) return false;
 
-        const montoPagado = reserva.montoPagado.equals(reserva.montoTotal)? `100%` : `50% con un monto de ${reserva.montoPagado}`;
-        const formatDate = new Intl.DateTimeFormat('es-ES', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        });
-
-        let mensaje = `Su reserva del vehículo ${reserva.auto.modelo} ${reserva.auto.marca}, con placa ${reserva.auto.placa} ` +
-                      `ha sido confirmada con un pago del ${montoPagado}.`;
-
+        const montoPagado = reserva.montoPagado.equals(reserva.montoTotal) ? "100%" : `50% (${reserva.montoPagado})`;
+        let mensaje = `Su reserva del vehículo ${reserva.auto.modelo} ${reserva.auto.marca} (placa ${reserva.auto.placa}) ha sido confirmada con un pago del ${montoPagado}.`;
+        
         if (!reserva.estaPagada && reserva.fechaLimitePago) {
-            const fechaLimite = formatDate.format(new Date(reserva.fechaLimitePago));
-            const diferenciaPago = reserva.montoTotal.sub(reserva.montoPagado);
-            mensaje += ` Debe completar el pago restante de ${diferenciaPago} antes del <strong>${fechaLimite}</strong>`;
+            const fechaLimite = new Date(reserva.fechaLimitePago).toLocaleDateString('es-ES');
+            mensaje += ` Complete el pago de ${reserva.montoTotal.sub(reserva.montoPagado)} antes del ${fechaLimite}.`;
         }
-
+        
         mensaje += `\nAtte: REDIBO`;
 
         await notificacionService.crearNotificacion({
@@ -606,9 +584,7 @@ export async function notificarReservaConfirmada(reservaId: string): Promise<boo
             tipoEntidad: 'Reserva',
         });
 
-        console.log(`Notificación de reserva confirmada enviada a usuario ${reserva.idCliente}`);
         return true;
-
     } catch (error) {
         console.error('Error al notificar reserva confirmada:', error);
         return false;

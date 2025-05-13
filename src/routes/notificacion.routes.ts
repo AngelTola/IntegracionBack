@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { NotificacionController, generarNotificacionRentaConcluida, generarNotificacionRentaCancelada, generarNotificacionNuevaCalificacion, generarNotificacionReservaConfirmada } from '../controllers/notificacion.controller';
+import { cambiarEstadoReserva } from '../controllers/notificacion.controller';
 import { SSEController } from '../controllers/sse.controller';
 import { SSEService } from '../services/sse.service';
 import { NotificacionService } from '../services/notificacion.service';
@@ -83,6 +84,10 @@ export const createNotificacionRoutes = () => {
     '/dropdown-notificaciones/:usuarioId',
     (req, res) => notificacionController.obtenerNotificacionesDropdown(req, res)
   );
+
+  router.put(
+    '/cambiar-estado-reserva/:reservaId', 
+    cambiarEstadoReserva);
 
   return router;
 };

@@ -1,3 +1,4 @@
+import prisma from '../config/database';
 import { Request, Response } from 'express';
 import { NotificacionService, notificarRentaConcluida, notificarRentaCancelada, notificarNuevaCalificacion, notificarReservaConfirmada } from '../services/notificacion.service';
 import { TipoDeNotificacion, PrioridadNotificacion } from '@prisma/client';
@@ -207,6 +208,38 @@ export async function generarNotificacionReservaConfirmada(req: Request, res: Re
   } catch (error) {
     console.error('Error al generar la notificación de reserva confirmada:', error);
     res.status(500).json({ error: 'Error al generar la notificación de reserva confirmada.' });
+  }
+}
+
+/**
+ * Endpoint para cambiar estado de reserva y generar notificación
+ */
+export async function cambiarEstadoReserva(req: Request, res: Response) {
+  const { reservaId } = req.params;
+  const { estado } = req.body;
+  
+  try {
+    // Primero actualizamos el estado de la reserva
+    const reservaActualizada = await prisma.reserva.update({
+      where: { idReserva: reservaId },
+      data: { estado }
+    });
+    
+    // Si el estado es CONFIRMADA, generamos la notificación
+    let notificacionCreada = false;
+    if (estado === 'CONFIRMADA') {
+      notificacionCreada = await notificarReservaConfirmada(reservaId);
+    }
+    
+    res.json({ 
+      success: true, 
+      reserva: reservaActualizada,
+      notificacion: notificacionCreada ? 'Notificación enviada' : 'No se requirió notificación' 
+    });
+    
+  } catch (error) {
+    console.error('Error al cambiar estado de reserva:', error);
+    res.status(500).json({ error: 'Error al cambiar el estado de la reserva' });
   }
 }
 
