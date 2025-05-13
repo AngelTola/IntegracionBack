@@ -72,6 +72,7 @@ model Notificacion {
   prioridad     PrioridadNotificacion @default(MEDIA)
   entidadId     String?
   tipoEntidad   String?               @db.VarChar(50)
+  haSidoBorrada Boolean               @default(false)
   leido         Boolean               @default(false)
   leidoEn       DateTime?
   creadoEn      DateTime              @default(now())

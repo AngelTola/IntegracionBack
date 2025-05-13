@@ -40,7 +40,9 @@ export class NotificacionService {
 
     async obtenerNotificaciones(filtros: NotificacionFiltro) {
         try {
-          const where: any = {};
+          const where: any = {
+            haSidoBorrada: false 
+          };
       
           if (filtros.usuarioId)   where.usuarioId   = filtros.usuarioId;
           if (filtros.tipo)        where.tipo        = filtros.tipo;
@@ -158,6 +160,10 @@ export class NotificacionService {
             if (notificacion.usuarioId !== usuarioId) {
                 throw new Error('No tienes permiso para ver esta notificación');
             }
+            
+            if (notificacion.haSidoBorrada) {
+                throw new Error('Esta notificación ha sido eliminada');
+            }
     
             // Ahora, obtener la imagen del auto asociada a esta notificación
             let imagenAuto: string | null = null;
@@ -238,6 +244,10 @@ export class NotificacionService {
             if (notificacion.usuarioId !== usuarioId) {
                 throw new Error('No tienes permiso para actualizar esta notificación');
             }
+            
+            if (notificacion.haSidoBorrada) {
+                throw new Error('Esta notificación ha sido eliminada');
+            }
 
             const actualizada = await prisma.notificacion.update({
                 where: { id },
@@ -273,9 +283,13 @@ export class NotificacionService {
             if (notificacion.usuarioId !== usuarioId) {
                 throw new Error('No tienes permiso para eliminar esta notificación');
             }
-
-            await prisma.notificacion.delete({
-                where: { id }
+            
+            // Usando soft delete en lugar de borrar físicamente
+            const eliminada = await prisma.notificacion.update({
+                where: { id },
+                data: { 
+                    haSidoBorrada: true
+                }
             });
 
             this.sseService.enviarNotificacion({
@@ -296,7 +310,8 @@ export class NotificacionService {
             const count = await prisma.notificacion.count({
                 where: {
                     usuarioId,
-                    leido: false
+                    leido: false,
+                    haSidoBorrada: false 
                 }
             });
 
@@ -313,6 +328,7 @@ export async function obtenerNoLeidas(userId: string) {
       where: {
         usuarioId: userId,
         leido: false,
+        haSidoBorrada: false 
       },
       orderBy: {
         creadoEn: 'desc',
@@ -341,6 +357,7 @@ export async function notificarRentaConcluida(rentaId: string): Promise<boolean>
           usuarioId: renta.cliente.id,
           entidadId: renta.id,
           tipo: 'ALQUILER_FINALIZADO',
+          haSidoBorrada: false
         },
       });
   
@@ -396,19 +413,17 @@ export async function notificarRentaCancelada(rentaId: string): Promise<boolean>
             console.error(`El vehículo ${renta.auto.id} no tiene propietario asignado.`);
             return false;
         }
-
-        //console.log(`Enviando notificación de cancelación al propietario: ${propietario.id}`);
     
         const notificacionExistente = await prisma.notificacion.findFirst({
             where: {
                 usuarioId: propietario.id,
                 entidadId: renta.id,
                 tipo: 'RESERVA_CANCELADA',
+                haSidoBorrada: false
             },
         });
 
         if (notificacionExistente) {
-            //console.log(`Ya existe una notificación de cancelación para la renta ${rentaId}`);
             return false;
         }
     
@@ -479,6 +494,7 @@ export async function notificarNuevaCalificacion(rentaId: string): Promise<boole
                 usuarioId: propietario.id,
                 entidadId: calificacion.id, // Usamos el id de la calificación
                 tipo: 'VEHICULO_CALIFICADO',
+                haSidoBorrada: false
             },
         });
 
@@ -551,11 +567,11 @@ export async function notificarReservaConfirmada(reservaId: string): Promise<boo
                 usuarioId: reserva.idCliente,
                 entidadId: reserva.idReserva,
                 tipo: 'RESERVA_CONFIRMADA',
+                haSidoBorrada: false
             },
         });
 
-        if (notificacionExistente) {
-            //console.log(`Ya existe una notificación de confirmación para la reserva ${reservaId}`);
+       if (notificacionExistente) {
             return false;
         }
 
