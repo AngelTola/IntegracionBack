@@ -34,6 +34,10 @@ export const validateLogin = (req: Request, res: Response, next: NextFunction) =
     return res.status(400).json({ message: 'Introduzca un dominio correcto' });
   }
 
+  if (password.length === 25) {
+    return res.status(400).json({ message: 'La cantidad máxima es de 25 caracteres' });
+  }
+
   if (password.length < 8 || password.length > 25) {
     return res.status(400).json({ message: 'La contraseña debe tener entre 8 y 25 caracteres' });
   }

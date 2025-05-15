@@ -19,7 +19,7 @@ passport.use(
         const name = profile.displayName;
 
         if (!email)
-          return done(new Error("No se pudo obtener el email de Google"), null);
+          return done(new Error("No se pudo obtener el email de Google"), false);
 
         const user = await findOrCreateGoogleUser(email, name);
 
@@ -35,7 +35,7 @@ passport.use(
           return done(null, false, { message: error.message });
         }
 
-        return done(error, null);
+        return done(error, undefined);
       }
     }
   )

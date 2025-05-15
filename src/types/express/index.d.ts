@@ -1,12 +1,9 @@
-// types/express/index.d.ts
-import { Usuario } from "@prisma/client";
+import { JwtPayload } from 'jsonwebtoken';
 
 declare global {
   namespace Express {
-    interface User extends Usuario {}
-
     interface Request {
-      user?: User;
+      user?: JwtPayload; // Solo el payload (id_usuario, email, nombre_completo)
     }
   }
 }

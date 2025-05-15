@@ -4,31 +4,35 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 const prisma = new PrismaClient();
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID!,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-  callbackURL: "http://localhost:3001/api/auth/google/callback",
-},
-async (accessToken, refreshToken, profile, done) => {
-  try {
-    const email = profile.emails?.[0].value;
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      callbackURL: "http://localhost:3001/api/auth/google/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const email = profile.emails?.[0].value;
 
-    let user = await prisma.user.findUnique({ where: { email } });
+        let user = await prisma.usuario.findUnique({ where: { email } });
 
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email,
-          nombre_completo: profile.displayName || "",
-        },
-      });
+        if (!user) {
+          user = await prisma.usuario.create({
+            data: {
+              email,
+              nombre_completo: profile.displayName || "",
+            },
+          });
+        }
+
+        done(null, user);
+      } catch (error) {
+        done(error, false);
+      }
     }
-
-    done(null, user);
-  } catch (error) {
-    done(error, null);
-  }
-}));
+  )
+);
 
 // 🟢 Serialización de sesión
 passport.serializeUser((user: any, done) => {
@@ -37,7 +41,7 @@ passport.serializeUser((user: any, done) => {
 
 passport.deserializeUser(async (email: string, done) => {
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.usuario.findUnique({ where: { email } });
     done(null, user || null);
   } catch (err) {
     done(err, null);
