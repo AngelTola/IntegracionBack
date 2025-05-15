@@ -8,41 +8,87 @@ generator client {
 }
 
 model Usuario {
-  id_usuario       Int                  @id @default(autoincrement())
-  nombre_completo  String               @db.VarChar(100)
-  email            String               @unique @db.VarChar(100)
-  contraseña       String? @default("") @db.VarChar(255)
+  id_usuario       Int           @id @default(autoincrement())
+  nombre_completo  String        @db.VarChar(100)
+  email            String        @unique @db.VarChar(100)
+  contraseña      String?       @default("") @db.VarChar(255)
   fecha_nacimiento DateTime?
   telefono         Int?
   registrado_con   RegistradoCon
-  fecha_registro   DateTime             @default(now())
-  verificado        Boolean   @default(false)   
-  host              Boolean   @default(false)
-  driver            Boolean   @default(false)
+  fecha_registro   DateTime      @default(now())
+  verificado       Boolean       @default(false)
+  host             Boolean       @default(false)
 
+  driver           Driver? @relation("UsuarioDriver")
+  assignedToDriver Int?
+  driverReferente  Driver? @relation("DriverToRenters", fields: [assignedToDriver], references: [id_usuario])
+
+  codigoVerificacion String?
+  isBlocked          Boolean   @default(false)
+  blockuntil         DateTime?
+  failedCodeAttempts Int       @default(0)
+
+  foto_perfil String? @db.VarChar(255) // NUEVO: para guardar la ruta de la foto
+  ediciones_nombre  Int       @default(0)
+  ediciones_fecha   Int       @default(0)
+  ediciones_telefono Int      @default(0)
+  
   verificaciones   Verificaciones[]
   terminosCondiciones Terminos_condiciones[]
+  vehiculos Vehiculo[]
+  // Método de pago directo
+  metodo_pago_tipo     TipoMetodoPago?
+  numero_tarjeta       String?                @db.VarChar(16)
+  fecha_expiracion     String?                @db.VarChar(5)
+  titular              String?                @db.VarChar(100)
+  imagen_qr            String?                @db.VarChar(255)
+  detalles_metodo_pago String?                @db.Text
+}
+
+model Vehiculo {
+  id_vehiculo Int      @id @default(autoincrement())
+  id_usuario  Int
+  placa       String   @db.VarChar(10)
+  soat        String   @db.VarChar(50)
+  imagenes    String[] // aquí guardarías los nombres de archivos o rutas
+  usuario     Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+model Driver {
+  id_usuario Int     @id
+  usuario    Usuario @relation("UsuarioDriver", fields: [id_usuario], references: [id_usuario])
+
+  sexo              String
+  telefono          String
+  nro_licencia      String
+  categoria         String
+  fecha_emision     DateTime
+  fecha_vencimiento DateTime
+  anversoUrl        String
+  reversoUrl        String
+
+  renters Usuario[] @relation("DriverToRenters") // lista de renters asignados
 }
 
 model Verificaciones {
-  id_codigo   Int       @id @default(autoincrement())
+  id_codigo  Int              @id @default(autoincrement())
   id_usuario Int
-  codigo      String    @db.VarChar(6)
-  tipo        TipoVerificacion
-  creado_en   DateTime  @default(now())
-  expiracion  DateTime
-  usado       Boolean   @default(false)
+  codigo     String           @db.VarChar(6)
+  tipo       TipoVerificacion
+  creado_en  DateTime         @default(now())
+  expiracion DateTime
+  usado      Boolean          @default(false)
 
-  usuario     Usuario   @relation(fields: [id_usuario], references: [id_usuario])
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
 }
 
 model Terminos_condiciones {
-  id_aceptacion Int      @id @default(autoincrement())
-  id_usuario    Int
-  version_terminos String @db.VarChar(10)
+  id_aceptacion    Int      @id @default(autoincrement())
+  id_usuario       Int
+  version_terminos String   @db.VarChar(10)
   fecha_aceptacion DateTime
 
-  usuario        Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
 }
 
 // Enum para registrado_con
@@ -55,4 +101,10 @@ enum RegistradoCon {
 enum TipoVerificacion {
   recuperacion
   verificacion
+}
+
+enum TipoMetodoPago {
+  tarjeta
+  efectivo
+  qr
 }
