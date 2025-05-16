@@ -569,7 +569,7 @@ export async function notificarReservaConfirmada(reservaId: string): Promise<boo
         
         if (!reserva.estaPagada && reserva.fechaLimitePago) {
             const fechaLimite = new Date(reserva.fechaLimitePago).toLocaleDateString('es-ES');
-            mensaje += ` Complete el pago de ${reserva.montoTotal.sub(reserva.montoPagado)} antes del ${fechaLimite}.`;
+            mensaje += ` Complete el pago de ${reserva.montoTotal.sub(reserva.montoPagado)} antes del <strong>${fechaLimite}</strong>.`;
         }
         
         mensaje += `\nAtte: REDIBO`;
