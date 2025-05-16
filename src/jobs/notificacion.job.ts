@@ -106,9 +106,16 @@ export class NotificacionJob {
     NotificacionJob.ejecucionConfirmadas = true;
 
     try {
+      // Obtener la fecha de hace 24 horas
+      const fechaLimite = new Date();
+      fechaLimite.setHours(fechaLimite.getHours() - 24);
+
       const reservasConfirmadas = await prisma.reserva.findMany({
         where: {
           estado: 'CONFIRMADA',
+          fechaSolicitud: {
+            gte: fechaLimite // Solo reservas confirmadas en las últimas 24 horas
+          }
         },
         include: {
           cliente: {
@@ -116,7 +123,7 @@ export class NotificacionJob {
               notificaciones: {
                 where: {
                   tipo: 'RESERVA_CONFIRMADA',
-                  leido: false,
+                  entidadId: undefined,
                 },
               },
             },
@@ -124,7 +131,7 @@ export class NotificacionJob {
         },
       });
 
-      // Filtrar las reservas que no han sido notificadas
+      // Filtrar las reservas que nunca han tenido una notificación de confirmación
       const sinNotificar = reservasConfirmadas.filter(
         (r) => r.cliente.notificaciones.length === 0
       );
