@@ -36,7 +36,6 @@ export class NotificacionJob {
               notificaciones: {
                 where: {
                   tipo: 'ALQUILER_FINALIZADO',
-                  leido: false,
                 },
               },
             },
@@ -75,7 +74,6 @@ export class NotificacionJob {
               notificaciones: {
                 where: {
                   tipo: 'RESERVA_CANCELADA',
-                  leido: false,
                 },
               },
             },
