@@ -3,6 +3,7 @@ import {
   notificarRentaConcluida,
   notificarRentaCancelada,
   notificarReservaConfirmada,
+  notificarReservaCancelada,
   NotificacionService
 } from '../services/notificacion.service';
 import { SSEService } from '../services/sse.service';
@@ -11,6 +12,7 @@ export class NotificacionJob {
   private static ejecucionFinalizadas = false;
   private static ejecucionCanceladas = false;
   private static ejecucionConfirmadas = false;
+  private static ejecucionPlazoPagoVencido = false;
   private static interval: NodeJS.Timeout;
 
   // Instancia única del servicio de notificaciones
@@ -111,9 +113,9 @@ export class NotificacionJob {
       const reservasConfirmadas = await prisma.reserva.findMany({
         where: {
           estado: 'CONFIRMADA',
-          fechaSolicitud: {
+          /*fechaSolicitud: {
             gte: fechaLimite // Solo reservas confirmadas en las últimas 24 horas
-          }
+          }*/
         },
         include: {
           cliente: {
@@ -145,11 +147,63 @@ export class NotificacionJob {
     }
   }
 
+   /** Revisa reservas confirmadas cuyo plazo de pago expiró y las cancela notificando al cliente */
+  private static async revisarReservasConPlazoPagoVencido() {
+    if (NotificacionJob.ejecucionPlazoPagoVencido) {
+      console.log('Reservas con plazo de pago vencido: ejecución en curso, se omite esta ronda.');
+      return;
+    }
+    NotificacionJob.ejecucionPlazoPagoVencido = true;
+
+    try {
+      // Buscar reservas confirmadas cuyo plazo de pago ya venció y no están pagadas
+      const reservasVencidas = await prisma.reserva.findMany({
+        where: {
+          estado: 'CONFIRMADA',
+          estaPagada: false,
+          fechaLimitePago: { lt: new Date() }
+        },
+        include: {
+          cliente: {
+            include: {
+              notificaciones: {
+                where: {
+                  tipo: 'RESERVA_CANCELADA',
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // Filtrar las reservas que aún no han sido notificadas como canceladas
+      const sinNotificar = reservasVencidas.filter(
+        (r) => r.cliente.notificaciones.length === 0
+      );
+
+      for (const reserva of sinNotificar) {
+        // Cambiar el estado de la reserva a CANCELADA
+        await prisma.reserva.update({
+          where: { idReserva: reserva.idReserva },
+          data: { estado: 'CANCELADA' }
+        });
+
+        // Generar la notificación de cancelación por falta de pago
+        await notificarReservaCancelada(reserva.idReserva);
+      }
+    } catch (error) {
+      console.error('Error revisando reservas con plazo de pago vencido:', error);
+    } finally {
+      NotificacionJob.ejecucionPlazoPagoVencido = false;
+    }
+  }
+
   /** Inicia el cron job que periódicamente revisa ambas listas */
   public static iniciar() {
     this.interval = setInterval(() => {
       NotificacionJob.revisarRentasFinalizadas();
       NotificacionJob.revisarRentasCanceladas();
+      NotificacionJob.revisarReservasConPlazoPagoVencido();
       NotificacionJob.revisarReservasConfirmadas();
     }, 2000); // cada 2 segundos
   }

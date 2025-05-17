@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { NotificacionController, generarNotificacionRentaConcluida, generarNotificacionRentaCancelada, generarNotificacionNuevaCalificacion, generarNotificacionReservaConfirmada } from '../controllers/notificacion.controller';
+import { NotificacionController, generarNotificacionRentaConcluida, generarNotificacionRentaCancelada, generarNotificacionNuevaCalificacion, generarNotificacionReservaConfirmada, generarNotificacionReservaCancelada } from '../controllers/notificacion.controller';
 import { cambiarEstadoReserva } from '../controllers/notificacion.controller';
 import { SSEController } from '../controllers/sse.controller';
 import { SSEService } from '../services/sse.service';
@@ -87,7 +87,13 @@ export const createNotificacionRoutes = () => {
 
   router.put(
     '/cambiar-estado-reserva/:reservaId', 
-    cambiarEstadoReserva);
+    cambiarEstadoReserva
+  );
+
+  router.post(
+    '/generar-reserva-cancelada/:reservaId',
+    generarNotificacionReservaCancelada
+  );
 
   return router;
 };

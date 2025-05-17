@@ -590,3 +590,57 @@ export async function notificarReservaConfirmada(reservaId: string): Promise<boo
         return false;
     }
 }
+
+/**
+ * Notifica al cliente cuando su reserva es cancelada por falta de pago restante.
+ * @param reservaId ID de la reserva cancelada
+ */
+export async function notificarReservaCancelada(reservaId: string): Promise<boolean> {
+    const notificacionService = new NotificacionService();
+
+    try {
+        const reserva = await prisma.reserva.findUnique({
+            where: { idReserva: reservaId },
+            include: { cliente: true, auto: true }
+        });
+
+        if (!reserva) {
+            console.error(`La reserva ${reservaId} no existe.`);
+            return false;
+        }
+
+        // Verifica si ya existe una notificación para esta cancelación
+        const notificacionExistente = await prisma.notificacion.findFirst({
+            where: {
+                usuarioId: reserva.idCliente,
+                entidadId: reserva.idReserva,
+                tipo: 'RESERVA_CANCELADA',
+                haSidoBorrada: false
+            }
+        });
+
+        if (notificacionExistente) return false;
+
+        let mensaje = `Su reserva del vehículo ${reserva.auto.modelo} ${reserva.auto.marca} (placa ${reserva.auto.placa}) ha sido cancelada por no completar el pago restante.`;
+        if (reserva.fechaLimitePago) {
+            const fechaLimite = new Date(reserva.fechaLimitePago).toLocaleDateString('es-ES');
+            mensaje += ` La fecha límite de pago era el <strong>${fechaLimite}</strong>.`;
+        }
+        mensaje += `\nAtte: REDIBO`;
+
+        await notificacionService.crearNotificacion({
+            usuarioId: reserva.idCliente,
+            titulo: 'Reserva Cancelada',
+            mensaje,
+            tipo: 'RESERVA_CANCELADA',
+            prioridad: 'ALTA',
+            entidadId: reserva.idReserva,
+            tipoEntidad: 'Reserva',
+        });
+
+        return true;
+    } catch (error) {
+        console.error('Error al notificar reserva cancelada por falta de pago:', error);
+        return false;
+    }
+}

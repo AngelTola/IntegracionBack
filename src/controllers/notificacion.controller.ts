@@ -1,6 +1,6 @@
 import prisma from '../config/database';
 import { Request, Response } from 'express';
-import { NotificacionService, notificarRentaConcluida, notificarRentaCancelada, notificarNuevaCalificacion, notificarReservaConfirmada } from '../services/notificacion.service';
+import { NotificacionService, notificarRentaConcluida, notificarRentaCancelada, notificarNuevaCalificacion, notificarReservaConfirmada, notificarReservaCancelada } from '../services/notificacion.service';
 import { TipoDeNotificacion, PrioridadNotificacion } from '@prisma/client';
 
 
@@ -243,3 +243,21 @@ export async function cambiarEstadoReserva(req: Request, res: Response) {
   }
 }
 
+/**
+ * Endpoint para notificar al cliente cuando su reserva es cancelada por falta de pago restante
+ */
+export async function generarNotificacionReservaCancelada(req: Request, res: Response) {
+  const { reservaId } = req.params;
+  try {
+    const creada = await notificarReservaCancelada(reservaId);
+
+    if (creada) {
+      res.json({ message: 'Notificación de cancelación por falta de pago generada correctamente.' });
+    } else {
+      res.json({ message: 'La notificación ya existía o la reserva no se encontró.' });
+    }
+  } catch (error) {
+    console.error('Error al generar la notificación de cancelación por falta de pago:', error);
+    res.status(500).json({ error: 'Error al generar la notificación de cancelación por falta de pago.' });
+  }
+}
