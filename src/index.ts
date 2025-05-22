@@ -44,13 +44,16 @@ app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//foto de perfil
-/*app.use('/uploads', express.static('uploads'));*/
-app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); //permite desde cualquier origen
-  res.header('Access-Control-Allow-Methods', 'GET');
-  next();
-}, express.static(path.join(__dirname, '..', 'uploads')));
+app.use(
+  "/uploads",
+  (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET");
+    next();
+  },
+  express.static(path.join(__dirname, "..", "uploads"))
+);
+
 app.use(
   session({
     secret: "mi_clave_secreta_segura", // cámbiala por algo más seguro
