@@ -20,6 +20,25 @@ import path from 'path';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+
+// ✅ CORS robusto – que responde incluso si hay error
+app.use((req: express.Request, res: express.Response, next: express.NextFunction): void => {
+  res.header("Access-Control-Allow-Origin", "http://34.10.219.81:3000");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+    return;
+  }
+
+  next();
+});
+
 // Middlewares
 app.use(cors({
   origin: "http://localhost:3000", // tu frontend
