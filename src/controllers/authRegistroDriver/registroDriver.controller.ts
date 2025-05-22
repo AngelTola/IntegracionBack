@@ -45,14 +45,15 @@ export const registrarDriverController = async (
       fecha_vencimiento: new Date(fecha_vencimiento),
       anversoUrl,
       reversoUrl,
-      rentersIds
+      rentersIds,
     });
 
-    res.status(201).json({ message: 'Registro de driver exitoso' });
-
+    res.status(201).json({ message: "Registro de driver exitoso" });
   } catch (error) {
-    console.error('Error en registrarDriverController:', error);
-    res.status(500).json({ message: 'Error al registrar driver', error: String(error) });
+    console.error("Error en registrarDriverController:", error);
+    res
+      .status(500)
+      .json({ message: "Error al registrar driver", error: String(error) });
     console.log("🔴 Respuesta del backend:", res.status);
   }
 };
