@@ -91,3 +91,5 @@ app.listen(PORT, () => {
 app.get("/puta", (req, res) => {
   res.send("que gei");
 });
+//guardadito
+export default app;
