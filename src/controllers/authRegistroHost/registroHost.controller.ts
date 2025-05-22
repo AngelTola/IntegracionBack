@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { registrarHostCompleto } from "@/services/pago.service";
+import { registrarHostCompleto } from "../../services/pago.service";
+
 
 export const registrarHostCompletoController = async (req: Request, res: Response): Promise<void> => {
   try {
