@@ -40,14 +40,7 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
 });
 
 // Middlewares
-app.use(cors({
-  origin: "http://localhost:3000", // tu frontend
-  credentials: true,               // para enviar cookies/sesiones
-}));
-/*app.use(helmet());*/
-app.use(helmet({
-  crossOriginResourcePolicy: false, // Añade esto para permitir imágenes externas
-}));
+app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
