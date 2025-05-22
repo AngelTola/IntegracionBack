@@ -7,7 +7,7 @@ import passwordRoutes from "../src/routes/password.routes";
 import authRoutes from "../src/routes/auth.routes";
 import session from "express-session";
 import passport from "passport";
-import authRegistroHostRoutes from './routes/registroHost.routes';
+import authRegistroHostRoutes from "../src/routes/registroHost.routes";
 import authRegistroDriverRoutes from './routes/registroDriver.routes'; // Import the driver routes
 import "./config/googleAuth"; // <--- importante
 import usuarioRoutes from './routes/usuario.routes';
