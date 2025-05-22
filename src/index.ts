@@ -76,6 +76,9 @@ app.use('/api', authRegistroDriverRoutes); // Añadir la ruta de registro de dri
 app.use('/api', usuarioRoutes); // Añadir la ruta de usuario aquí
 app.use('/api', visualizarDriverRoutes);// Añadir la ruta de visualizar driver aquí
 
+app.get("/", (req, res) => {
+  res.send("¡Hola desde la página principal!");
+});
 
 // End point para verificar la salud de la conexión de la API
 app.get("/health", (req, res) => {
