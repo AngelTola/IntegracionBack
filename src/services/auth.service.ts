@@ -104,12 +104,12 @@ export const findOrCreateGoogleUser = async (email: string, name: string) => {
       error.name = "EmailAlreadyRegistered";
       throw error;
     }
-
-    if (existingUser) return existingUser;
-
+    console.log("✅ Usuario ya registrado con Google, retornando");
+    return { user: existingUser, isNew: false };
   }
 
-  return prisma.usuario.create({
+  console.log("🆕 Usuario no existe, creando uno nuevo con Google");
+  const newUser = await prisma.usuario.create({
     data: {
       email,
       nombre_completo: name,
