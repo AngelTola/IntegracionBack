@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { PrismaClient } from "@prisma/client";
 import { findOrCreateGoogleUser } from "../services/auth.service";
+import { generateToken } from "../utils/generateToken";
 
 const prisma = new PrismaClient();
 
