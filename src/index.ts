@@ -4,7 +4,7 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 dotenv.config();
 import passwordRoutes from './routes/password.routes';
-import authRoutes from './routes/auth.routes';
+import authRoutes from "../src/routes/auth.routes";
 import session from "express-session";
 import passport from "passport";
 import authRegistroHostRoutes from './routes/registroHost.routes';
