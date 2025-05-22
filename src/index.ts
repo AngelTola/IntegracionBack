@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
-import helmet from 'helmet';
+import helmet from "helmet";
 import dotenv from 'dotenv';
 dotenv.config();
 import passwordRoutes from './routes/password.routes';
