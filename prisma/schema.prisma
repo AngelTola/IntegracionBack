@@ -18,6 +18,7 @@ model Usuario {
   fecha_registro   DateTime      @default(now())
   verificado       Boolean       @default(false)
   host             Boolean       @default(false)
+  driverBool       Boolean       @default(false)
 
   driver           Driver? @relation("UsuarioDriver")
   assignedToDriver Int?

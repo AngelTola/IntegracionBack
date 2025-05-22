@@ -89,5 +89,5 @@ Repositorio para el desarrollo Back-end de la aplicación web RediBo. Este proye
 
 - **prisma:studio**: Abre la interfaz de Prisma Studio para visualizar la base de datos
   ```bash
-  
+  pnpm prisma:studio
   ```

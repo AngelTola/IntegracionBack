@@ -1,4 +1,4 @@
-import passport from "passport";
+/* import passport from "passport";
 import { PrismaClient } from "@prisma/client";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
@@ -12,9 +12,9 @@ passport.use(
       callbackURL: "http://localhost:3001/api/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
+      console.log("🔵 Iniciando autenticación Google - Perfil recibido:", JSON.stringify(profile, null, 2)); // 👈 Log 1
       try {
         const email = profile.emails?.[0].value;
-
         let user = await prisma.usuario.findUnique({ where: { email } });
 
         if (!user) {
@@ -47,3 +47,5 @@ passport.deserializeUser(async (email: string, done) => {
     done(err, null);
   }
 });
+  //sadasdsadasda
+ */

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { recoverPassword } from '../controllers/password.controller';
-import { verifyCode } from '../controllers/verifyCodeController';
-import { resetPassword } from '../controllers/resetPasswordController';
+import { recoverPassword } from '../controllers/authRecuperarContraseña/password.controller';
+import { verifyCode } from '../controllers/authRecuperarContraseña/verifyCodeController';
+import { resetPassword } from '../controllers/authRecuperarContraseña/resetPasswordController';
 
 const router = Router();
 

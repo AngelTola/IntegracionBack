@@ -27,7 +27,7 @@ export const createUser = async (data: {
       registrado_con: "email",
       verificado: false,
       host: false,
-      driver: false,
+      //driver: false,
     },
   });
 };
