@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { registrarDriverCompleto } from "../../services/registroDriver.service";
 
-export const registrarDriverController = async (req: Request, res: Response): Promise<void> => {
+export const registrarDriverController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const {
       sexo,
