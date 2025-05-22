@@ -52,6 +52,7 @@ export const updateGoogleProfile = async (
     data: {
       nombre_completo,
       fecha_nacimiento: new Date(fecha_nacimiento),
+      telefono: telefono ? parseInt(telefono) : undefined, // ✅ lo guarda
     },
   });
 
