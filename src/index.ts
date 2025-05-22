@@ -56,13 +56,11 @@ app.use(
 
 app.use(
   session({
-    secret: "mi_clave_secreta_segura",
+    secret: "mi_clave_secreta_segura", // cámbiala por algo más seguro
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      httpOnly: true,
+      secure: false, // ⚠️ en producción debe ser true con HTTPS
       maxAge: 24 * 60 * 60 * 1000,
     },
   })
@@ -71,7 +69,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/uploads', express.static('uploads')); // Servir imágenes desde el servidor
 
-app.use('/api', authRoutes);
+app.use("/api", authRoutes);
 app.use('/api', passwordRoutes);
 app.use('/api', authRegistroHostRoutes);
 app.use('/api', authRegistroDriverRoutes); // Añadir la ruta de registro de driver aquí
