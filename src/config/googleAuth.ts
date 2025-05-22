@@ -11,10 +11,15 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      callbackURL: "http://localhost:3001/api/auth/google/callback",
-    },
-
-    async (_accessToken, _refreshToken, profile, done) => {
+      callbackURL:
+      "https://redibo-back-wtt.vercel.app/api/auth/google/callback",
+  },
+  async (_accessToken, _refreshToken, profile, done) => {
+    console.log("🔵 Perfil de Google:", profile);
+    console.log(
+      "🔵 Iniciando autenticación Google - Perfil recibido:",
+      JSON.stringify(profile, null, 2)
+    ); // 👈 Log 1
       try {
         const email = profile.emails?.[0].value;
         const name = profile.displayName;
