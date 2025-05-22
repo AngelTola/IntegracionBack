@@ -15,14 +15,14 @@ export const registrarDriverController = async (
       fecha_vencimiento,
       anversoUrl,
       reversoUrl,
-      rentersIds
+      rentersIds,
     } = req.body;
 
     console.log("📥 Datos recibidos del formulario:", req.body); // 👈 LOG 1
     console.log("👤 Usuario autenticado en req.user:", req.user); // 👈 LOG 2
 
     if (!Array.isArray(rentersIds) || rentersIds.length === 0) {
-      res.status(400).json({ message: 'Debes seleccionar al menos un renter' });
+      res.status(400).json({ message: "Debes seleccionar al menos un renter" });
       console.log("🔴 Respuesta del backend:", res.status);
       return;
     }
