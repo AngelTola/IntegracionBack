@@ -18,6 +18,8 @@ export const registrarDriverController = async (
       rentersIds
     } = req.body;
 
+    console.log("📥 Datos recibidos del formulario:", req.body); // 👈 LOG 1
+
     if (!Array.isArray(rentersIds) || rentersIds.length === 0) {
       res.status(400).json({ message: 'Debes seleccionar al menos un renter' });
       console.log("🔴 Respuesta del backend:", res.status);
