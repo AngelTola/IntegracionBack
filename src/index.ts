@@ -56,11 +56,13 @@ app.use(
 
 app.use(
   session({
-    secret: "mi_clave_secreta_segura", // cámbiala por algo más seguro
+    secret: "mi_clave_secreta_segura",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // ⚠️ en producción debe ser true con HTTPS
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     },
   })
