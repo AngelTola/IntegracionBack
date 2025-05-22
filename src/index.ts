@@ -10,7 +10,7 @@ import passport from "passport";
 import authRegistroHostRoutes from './routes/registroHost.routes';
 import authRegistroDriverRoutes from './routes/registroDriver.routes'; // Import the driver routes
 import "./config/googleAuth"; // <--- importante
-import usuarioRoutes from '@/routes/usuario.routes';
+import usuarioRoutes from './routes/usuario.routes';
 import visualizarDriverRoutes from "./routes/visualizarDriver.routes";
 
 import path from 'path';
