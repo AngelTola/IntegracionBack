@@ -28,6 +28,7 @@ passport.use(
             data: {
               email,
               nombre_completo: profile.displayName || "",
+              registrado_con: "google", // asegúrate que esto esté en tu modelo
             },
           });
         }
