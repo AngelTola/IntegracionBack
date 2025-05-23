@@ -13,9 +13,13 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    console.log("✅ Usuario decodificado del token:", decoded); // ✅ Log del usuario
+
     req.user = decoded; // 👈 Aquí queda el usuario
       next();
     } catch (error) {
+
+      console.error("❌ Token inválido:", error); // ✅ Log de error de token
       res.status(403).json({ message: 'Token inválido' });
       return;
     }
