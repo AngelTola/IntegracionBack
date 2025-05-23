@@ -15,6 +15,12 @@ passport.use(
       console.log("🔵 Iniciando autenticación Google - Perfil recibido:", JSON.stringify(profile, null, 2)); // 👈 Log 1
       try {
         const email = profile.emails?.[0].value;
+        
+        // ✅ Validación obligatoria
+        if (!email) {
+          return done(new Error("No se pudo obtener el email del perfil de Google"), false);
+        }
+
         let user = await prisma.usuario.findUnique({ where: { email } });
 
         if (!user) {
