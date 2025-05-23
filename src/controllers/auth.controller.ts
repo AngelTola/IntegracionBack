@@ -411,7 +411,33 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteIncompleteUserController = async (req: Request, res: Response): Promise<void> => {
+  const { email } = req.body;
 
+  if (!email) {
+     res.status(400).json({ message: "Falta el email" });
+  }
+
+  try {
+    const user = await prisma.usuario.findUnique({ where: { email } });
+
+    if (!user) {
+       res.status(404).json({ message: "Usuario no encontrado" });
+       return;
+    }
+
+    if (user.verificado) {
+       res.status(400).json({ message: "El usuario ya fue verificado, no se puede eliminar" });
+    }
+
+    await prisma.usuario.delete({ where: { email } });
+
+     res.status(200).json({ message: "Usuario eliminado con éxito" });
+  } catch (error) {
+    console.error("Error al eliminar usuario incompleto:", error);
+     res.status(500).json({ message: "Error interno del servidor" });
+  }
+}; 
 export const checkPhoneExists = async (req: Request, res: Response): Promise<void> => {
   const { telefono } = req.body;
 
@@ -423,6 +449,7 @@ export const checkPhoneExists = async (req: Request, res: Response): Promise<voi
     const user = await authService.findUserByPhone(telefono);
     if (user) {
        res.json({ exists: true });
+       return;
     }
      res.json({ exists: false });
   } catch (error) {
