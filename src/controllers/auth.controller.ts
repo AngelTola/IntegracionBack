@@ -341,7 +341,7 @@ export const updateUserField = async (req: Request, res: Response) => {
     if (campo === 'fecha_nacimiento') {
       const fechaValida = Date.parse(valor);
       if (isNaN(fechaValida)) {
-        return res.status(400).json({ message: 'Fecha inválida.' });
+        res.status(400).json({ message: 'Fecha inválida.' });
       }
     }
 
