@@ -1,12 +1,8 @@
 import { PrismaClient, Usuario } from '@prisma/client';
 import { Request, Response } from "express";
-import * as authService from "@/services/auth.service";
-//Ingreso de token
-import { generateToken } from '@/utils/generateToken';
+import * as authService from "../services/auth.service";
+import { generateToken } from '../utils/generateToken';
 
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 
 import { updateGoogleProfile as updateGoogleProfileService } from "../services/auth.service";
 
