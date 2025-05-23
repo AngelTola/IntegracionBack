@@ -45,9 +45,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const updateGoogleProfile = async (req: Request, res: Response): Promise<void> => {
-  const { nombre_completo, fecha_nacimiento } = req.body;
+  console.log("📍 REQ.USER:", req.user);
+  const { nombre_completo, fecha_nacimiento, telefono } = req.body;
   const email = (req.user as { email: string }).email;
-  //const email = req.user?.email;
 
   if (!email) {
      res.status(401).json({ message: "Usuario no autenticado" });
