@@ -381,7 +381,7 @@ export const updateUserField = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserProfile = async (req: Request, res: Response) => {
+export const getUserProfile = async (req: Request, res: Response): Promise<void> => {
   const id_usuario = Number(req.params.id_usuario); // Aseguramos que sea número
 
   if (isNaN(id_usuario)) {
