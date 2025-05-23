@@ -291,11 +291,11 @@ export const updateUserField = async (req: Request, res: Response) => {
     }) as any;
 
     if (!user) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+      res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
     if (user[campoContador] >= 3) {
-      return res.status(403).json({ message: 'Has alcanzado el límite de 3 ediciones para este campo. Para más cambios, contacta al soporte.' });
+       res.status(403).json({ message: 'Has alcanzado el límite de 3 ediciones para este campo. Para más cambios, contacta al soporte.' });
     }
 
     const valorActual = user[campo];
