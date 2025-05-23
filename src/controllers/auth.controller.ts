@@ -397,8 +397,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
       return;
     }
 
-    // Devolvemos los datos sin contraseña ni campos sensibles
-    return res.status(200).json({
+    res.status(200).json({
       id_usuario: user.id_usuario,
       nombre_completo: user.nombre_completo,
       email: user.email,
