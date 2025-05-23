@@ -328,14 +328,13 @@ export const updateUserField = async (req: Request, res: Response) => {
     if (campo === 'telefono') {
       const telefonoStr = valor.toString();
       if (!/^[0-9]*$/.test(telefonoStr)) {
-        return res.status(400).json({ message: 'Formato inválido, ingrese solo números.' });
+        res.status(400).json({ message: 'Formato inválido, ingrese solo números.' });
       }
       if (!/^[0-9]{8}$/.test(telefonoStr)) {
-        return res.status(400).json({ message: 'El teléfono debe ser un número de 8 dígitos.' });
+         res.status(400).json({ message: 'El teléfono debe ser un número de 8 dígitos.' });
       }
       if (!/^[67]/.test(telefonoStr)) {
-        return res.status(400).json({ message: 'El teléfono debe comenzar con 6 o 7.' });
-      }
+         res.status(400).json({ message: 'El teléfono debe comenzar con 6 o 7.' });
     }
 
     if (campo === 'fecha_nacimiento') {
