@@ -302,7 +302,7 @@ export const updateUserField = async (req: Request, res: Response) => {
     const nuevoValor = campo === 'telefono' ? parseInt(valor, 10) : campo === 'fecha_nacimiento' ? new Date(valor) : valor;
 
     if (valorActual?.toString() === nuevoValor?.toString()) {
-      return res.status(200).json({
+      res.status(200).json({
         message: 'No hubo cambios en el valor.',
         edicionesRestantes: 3 - user[campoContador]
       });
