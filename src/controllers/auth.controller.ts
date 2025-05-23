@@ -311,17 +311,17 @@ export const updateUserField = async (req: Request, res: Response) => {
     // Validaciones personalizadas
     if (campo === 'nombre_completo') {
       if (typeof valor !== 'string' || valor.length < 3 || valor.length > 50) {
-        return res.status(400).json({ message: 'El nombre debe tener entre 3 y 50 caracteres.' });
+        res.status(400).json({ message: 'El nombre debe tener entre 3 y 50 caracteres.' });
       }
       const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/;
       if (!soloLetrasRegex.test(valor)) {
-        return res.status(400).json({ message: 'El nombre solo puede contener letras y espacios.' });
+         res.status(400).json({ message: 'El nombre solo puede contener letras y espacios.' });
       }
       if (/\s{2,}/.test(valor)) {
-        return res.status(400).json({ message: 'El nombre no debe tener más de un espacio consecutivo.' });
+         res.status(400).json({ message: 'El nombre no debe tener más de un espacio consecutivo.' });
       }
       if (/^\s|\s$/.test(valor)) {
-        return res.status(400).json({ message: 'El nombre no debe comenzar ni terminar con espacios.' });
+         res.status(400).json({ message: 'El nombre no debe comenzar ni terminar con espacios.' });
       }
     }
 
