@@ -361,7 +361,7 @@ export const updateUserField = async (req: Request, res: Response) => {
       infoExtra = 'Has alcanzado el límite de 3 ediciones para este campo. Para más cambios, contacta al soporte.';
     }
 
-    return res.json({
+    res.json({
       message: `$${
         campo === 'nombre_completo' ? 'Nombre' :
         campo === 'telefono' ? 'Teléfono' :
