@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { obtenerRentersDisponibles } from '@/controllers/authRegistroDriver/usuario.controller';
+import { obtenerRentersDisponibles } from '../controllers/authRegistroDriver/usuario.controller';
 
 const router = Router();
 
