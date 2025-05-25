@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3001;
 
 // ✅ CORS robusto – que responde incluso si hay error
 app.use((req: express.Request, res: express.Response, next: express.NextFunction): void => {
-  res.header("Access-Control-Allow-Origin", "http://34.10.219.81:3000");
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Headers",
