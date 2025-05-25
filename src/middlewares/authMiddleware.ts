@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-export interface JwtPayload {
+interface JwtPayload {
   id_usuario: number;
   email: string;
   nombre_completo: string;
@@ -27,7 +27,7 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction): vo
   }
 };
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {

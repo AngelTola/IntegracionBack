@@ -21,7 +21,7 @@ export const verifyCode = async (req: Request): Promise<string> => {
 };*/
 
 
-export const verifyCode = async (req: Request, res: Response) => {
+export const verifyCode = async (req: Request, res: Response): Promise<void> => {
   const { code } = req.body;
   
   console.log('🧪 Código recibido:', code, userData.codeBD);
@@ -59,7 +59,7 @@ export const verifyCode = async (req: Request, res: Response) => {
             failedCodeAttempts: 0,
           },
         });
-        return res.status(200).json({ message: 'Código verificado correctamente' });
+         res.status(200).json({ message: 'Código verificado correctamente' });
       }else {
         console.log('Código incorrecto. Incrementando los intentos fallidos...');
         updatedUser = await prisma.usuario.update({
@@ -83,9 +83,9 @@ export const verifyCode = async (req: Request, res: Response) => {
             },
           });
           console.log(`Usuario bloqueado hasta: ${blockUntil.toISOString()}`);
-          return res.status(400).json({ message: 'Código incorrecto. Usuario bloqueado temporalmente.' });
+           res.status(400).json({ message: 'Código incorrecto. Usuario bloqueado temporalmente.' });
         }
-        return res.status(400).json({ message: 'Código incorrecto. Por favor intenta nuevamente' });
+         res.status(400).json({ message: 'Código incorrecto. Por favor intenta nuevamente' });
       }
     }   
       
