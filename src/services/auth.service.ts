@@ -23,7 +23,7 @@ export const createUser = async (data: {
       email: data.email,
       contraseña: hashedPassword,
       fecha_nacimiento: new Date(data.fecha_nacimiento),
-      telefono: data.telefono ?? null,
+      telefono: data.telefono ? String(data.telefono) : null,
       registrado_con: "email",
       verificado: false,
       host: false,
