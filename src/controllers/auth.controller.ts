@@ -36,7 +36,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 };
-
+  
 export const updateGoogleProfile = async (
   req: Request,
   res: Response
@@ -186,18 +186,16 @@ export const updateUserField = async (req: Request, res: Response) => {
     }
 
     if (user[campoContador] >= 3) {
-      res
-        .status(403)
-        .json({
-          message:
-            "Has alcanzado el límite de 3 ediciones para este campo. Para más cambios, contacta al soporte.",
-        });
+      res.status(403).json({
+        message:
+          "Has alcanzado el límite de 3 ediciones para este campo. Para más cambios, contacta al soporte.",
+      });
     }
 
     const valorActual = user[campo];
     const nuevoValor =
       campo === "telefono"
-        ? parseInt(valor, 10)
+        ? valor.trim()
         : campo === "fecha_nacimiento"
         ? new Date(valor)
         : valor;
@@ -218,25 +216,19 @@ export const updateUserField = async (req: Request, res: Response) => {
       }
       const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/;
       if (!soloLetrasRegex.test(valor)) {
-        res
-          .status(400)
-          .json({
-            message: "El nombre solo puede contener letras y espacios.",
-          });
+        res.status(400).json({
+          message: "El nombre solo puede contener letras y espacios.",
+        });
       }
       if (/\s{2,}/.test(valor)) {
-        res
-          .status(400)
-          .json({
-            message: "El nombre no debe tener más de un espacio consecutivo.",
-          });
+        res.status(400).json({
+          message: "El nombre no debe tener más de un espacio consecutivo.",
+        });
       }
       if (/^\s|\s$/.test(valor)) {
-        res
-          .status(400)
-          .json({
-            message: "El nombre no debe comenzar ni terminar con espacios.",
-          });
+        res.status(400).json({
+          message: "El nombre no debe comenzar ni terminar con espacios.",
+        });
       }
     }
 
@@ -356,11 +348,9 @@ export const deleteIncompleteUserController = async (
     }
 
     if (user.verificado) {
-      res
-        .status(400)
-        .json({
-          message: "El usuario ya fue verificado, no se puede eliminar",
-        });
+      res.status(400).json({
+        message: "El usuario ya fue verificado, no se puede eliminar",
+      });
     }
 
     await prisma.usuario.delete({ where: { email } });

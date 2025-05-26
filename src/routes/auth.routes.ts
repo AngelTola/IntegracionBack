@@ -30,18 +30,6 @@ router.get(
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-/*uter.get(
-  "/auth/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000?error=google",
-    session: true,
-  }),
-  (req, res) => {
-    // 🔥 Redirige al front para que abra el modal de completar perfil
-      res.redirect("http://localhost:3000/home?googleComplete=true");
-  }
-); */
-
 router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
@@ -78,6 +66,8 @@ router.get(
     );
   }
 );
+
+
 router.get("/auth/success", (req, res) => {
   res.send("Inicio de sesión con Google exitoso!");
 });
