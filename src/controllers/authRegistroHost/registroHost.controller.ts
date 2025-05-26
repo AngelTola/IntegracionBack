@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
-import { registrarHostCompleto } from "@/services/pago.service";
+import { registrarHostCompleto } from "../../services/pago.service";
+import { uploadToCloudinary } from "../../services/upload.service"; // ⬅ nuevo import
 
-export const registrarHostCompletoController = async (req: Request, res: Response): Promise<void> => {
+export const registrarHostCompletoController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const usuario = req.user as { id_usuario: number };
     const {
@@ -14,8 +18,13 @@ export const registrarHostCompletoController = async (req: Request, res: Respons
       detalles_metodo,
     } = req.body;
 
-    const imagenes = (req.files as any).imagenes || [];
-    const qrImage = (req.files as any).qrImage?.[0];
+    const files = req.files as {
+      imagenes?: Express.Multer.File[];
+      qrImage?: Express.Multer.File[];
+    };
+
+    const imagenes = files?.imagenes || [];
+    const qrFile = files?.qrImage?.[0];
 
     if (!placa || !soat || imagenes.length < 3) {
       res.status(400).json({ message: "Faltan datos del vehículo" });
@@ -23,23 +32,40 @@ export const registrarHostCompletoController = async (req: Request, res: Respons
     }
 
     const tipoFinal =
-      tipo === "card" ? "tarjeta" : tipo === "qr" ? "qr" : tipo === "cash" ? "efectivo" : null;
+      tipo === "card"
+        ? "tarjeta"
+        : tipo === "qr"
+        ? "qr"
+        : tipo === "cash"
+        ? "efectivo"
+        : null;
 
     if (!tipoFinal) {
       res.status(400).json({ message: "Tipo de método de pago inválido" });
       return;
     }
+    // ⬇ Subida de imágenes del vehículo a Cloudinary
+    const imagenesSubidas = await Promise.all(
+      imagenes.map((file) => uploadToCloudinary(file))
+    );
 
+    // ⬇ Subida de imagen QR si existe
+    let imagen_qr: string | undefined = undefined;
+    if (qrFile) {
+      imagen_qr = await uploadToCloudinary(qrFile);
+    }
+
+    // ⬇ Registrar en BD usando servicio existente
     await registrarHostCompleto({
       id_usuario: usuario.id_usuario,
       placa,
       soat,
-      imagenes: imagenes.map((f: any) => f.filename),
+      imagenes: imagenesSubidas, // ahora son URLs, no filenames
       tipo: tipoFinal,
       numero_tarjeta,
       fecha_expiracion,
       titular,
-      imagen_qr: qrImage?.filename,
+      imagen_qr,
       detalles_metodo_pago: detalles_metodo,
     });
 
@@ -50,4 +76,3 @@ export const registrarHostCompletoController = async (req: Request, res: Respons
     res.status(500).json({ message: "Error al registrar host" });
   }
 };
-

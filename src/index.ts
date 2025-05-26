@@ -1,16 +1,17 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import dotenv from 'dotenv';
+import express, { Request, Response, NextFunction } from "express";
+import cors from "cors";
+import helmet from "helmet";
+import dotenv from "dotenv";
 dotenv.config();
-import passwordRoutes from './routes/password.routes';
-import authRoutes from './routes/auth.routes';
+import passwordRoutes from "../src/routes/password.routes";
+import authRoutes from "../src/routes/auth.routes";
 import session from "express-session";
 import passport from "passport";
-import authRegistroHostRoutes from './routes/registroHost.routes';
+import "../src/config/googleAuth";
+import authRegistroHostRoutes from "../src/routes/registroHost.routes";
 import authRegistroDriverRoutes from './routes/registroDriver.routes'; // Import the driver routes
 import "./config/googleAuth"; // <--- importante
-import usuarioRoutes from '@/routes/usuario.routes';
+import usuarioRoutes from './routes/usuario.routes';
 import visualizarDriverRoutes from "./routes/visualizarDriver.routes";
 
 import path from 'path';
@@ -19,25 +20,40 @@ import path from 'path';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+
+// ✅ CORS robusto – que responde incluso si hay error
+app.use((req: express.Request, res: express.Response, next: express.NextFunction): void => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+    return;
+  }
+
+  next();
+});
+
 // Middlewares
-app.use(cors({
-  origin: "http://localhost:3000", // tu frontend
-  credentials: true,               // para enviar cookies/sesiones
-}));
-/*app.use(helmet());*/
-app.use(helmet({
-  crossOriginResourcePolicy: false, // Añade esto para permitir imágenes externas
-}));
+app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//foto de perfil
-/*app.use('/uploads', express.static('uploads'));*/
-app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); //permite desde cualquier origen
-  res.header('Access-Control-Allow-Methods', 'GET');
-  next();
-}, express.static(path.join(__dirname, '..', 'uploads')));
+app.use(
+  "/uploads",
+  (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET");
+    next();
+  },
+  express.static(path.join(__dirname, "..", "uploads"))
+);
+
 app.use(
   session({
     secret: "mi_clave_secreta_segura", // cámbiala por algo más seguro
@@ -53,13 +69,16 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/uploads', express.static('uploads')); // Servir imágenes desde el servidor
 
-app.use('/api', authRoutes);
-app.use('/api', passwordRoutes);
-app.use('/api', authRegistroHostRoutes);
+app.use("/api", authRoutes);
+app.use("/api", passwordRoutes);
+app.use("/api", authRegistroHostRoutes);
 app.use('/api', authRegistroDriverRoutes); // Añadir la ruta de registro de driver aquí
 app.use('/api', usuarioRoutes); // Añadir la ruta de usuario aquí
 app.use('/api', visualizarDriverRoutes);// Añadir la ruta de visualizar driver aquí
 
+app.get("/", (req, res) => {
+  res.send("¡Hola desde la página principal!");
+});
 
 // End point para verificar la salud de la conexión de la API
 app.get("/health", (req, res) => {
@@ -69,3 +88,8 @@ app.get("/health", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+app.get("/puta", (req, res) => {
+  res.send("que gei");
+});
+//guardadito
+export default app;

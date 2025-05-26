@@ -1,18 +1,18 @@
 import { Request, Response } from 'express';
 import multer from 'multer';
 import { PrismaClient } from '@prisma/client';
-import { cloudinary } from '@/config/cloudinary';
+import { cloudinary } from '../../config/cloudinary';
 import type { UploadApiResponse } from 'cloudinary';
 
 const prisma = new PrismaClient();
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });
 
-export const uploadProfilePhoto = async (req: Request, res: Response) => {
+export const uploadProfilePhoto = async (req: Request, res: Response): Promise<void> => {
   const { id_usuario } = req.user as { id_usuario: number };
 
   if (!req.file) {
-    return res.status(400).json({ message: 'No se subió ninguna imagen.' });
+     res.status(400).json({ message: 'No se subió ninguna imagen.' });
   }
 
   try {
@@ -35,14 +35,14 @@ export const uploadProfilePhoto = async (req: Request, res: Response) => {
       data: { foto_perfil: result.secure_url },
     });
 
-    return res.json({ message: 'Foto actualizada exitosamente.', foto_perfil: result.secure_url });
+     res.json({ message: 'Foto actualizada exitosamente.', foto_perfil: result.secure_url });
   } catch (error) {
     console.error('Error al subir a Cloudinary:', error);
-    return res.status(500).json({ message: 'Error al subir la imagen' });
+     res.status(500).json({ message: 'Error al subir la imagen' });
   }
 };
 
-export const deleteProfilePhoto = async (req: Request, res: Response) => {
+export const deleteProfilePhoto = async (req: Request, res: Response): Promise<void> => {
   const { id_usuario } = req.user as { id_usuario: number };
 
   try {
@@ -52,7 +52,8 @@ export const deleteProfilePhoto = async (req: Request, res: Response) => {
     });
 
     if (!user?.foto_perfil) {
-      return res.status(400).json({ message: 'No hay foto para eliminar.' });
+       res.status(400).json({ message: 'No hay foto para eliminar.' });
+       return;
     }
 
     const segments = user.foto_perfil.split('/');
@@ -65,9 +66,9 @@ export const deleteProfilePhoto = async (req: Request, res: Response) => {
       data: { foto_perfil: null },
     });
 
-    return res.json({ message: 'Foto eliminada exitosamente.' });
+     res.json({ message: 'Foto eliminada exitosamente.' });
   } catch (error) {
     console.error('Error al eliminar la foto:', error);
-    return res.status(500).json({ message: 'Error al eliminar la foto.' });
+     res.status(500).json({ message: 'Error al eliminar la foto.' });
   }
 };
