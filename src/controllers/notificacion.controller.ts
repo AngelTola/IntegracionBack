@@ -1,6 +1,8 @@
 import prisma from '../config/database';
 import { Request, Response } from 'express';
-import { NotificacionService, notificarRentaConcluida, notificarRentaCancelada, notificarNuevaCalificacion, notificarReservaConfirmada, notificarReservaCancelada } from '../services/notificacion.service';
+import { NotificacionService, notificarRentaConcluida, 
+         notificarRentaCancelada, notificarNuevaCalificacion, 
+         notificarReservaConfirmada, notificarReservaCancelada} from '../services/notificacion.service';
 import { TipoDeNotificacion, PrioridadNotificacion } from '@prisma/client';
 
 
@@ -133,6 +135,37 @@ export class NotificacionController {
       res.status(500).json({
         error: error.message || 'Error al obtener notificaciones para el dropdown'
       });
+    }
+  }
+
+  async generarNotificacionDepositoGarantia(req: Request, res: Response) {
+    const { reservaId } = req.params;
+    try {
+      const creada = await this.notificacionService.notificarDepositoGarantia(reservaId);
+
+      if (creada) {
+        res.json({ message: 'Notificación de depósito de garantía generada correctamente.' });
+      } else {
+        res.json({ message: 'La notificación ya existía o la reserva no se encontró.' });
+      }
+    } catch (error) {
+      console.error('Error al generar la notificación de depósito de garantía:', error);
+      res.status(500).json({ error: 'Error al generar la notificación de depósito de garantía.' });
+    }
+  }
+
+  async generarNotificacionDepositoGarantiaPropietario(req: Request, res: Response) {
+    const { reservaId } = req.params;
+    try{
+      const creada = await this.notificacionService.notificarDepositoGarantiaPropietario(reservaId);
+      if(creada){
+        res.json({ message: 'Notificacion para el propietario generada correctamente.'});
+      }else{
+        res.json({message: 'La notificacion ya existia o la reserva no se encontro. '});
+      }
+    }catch(error){
+      console.error('Error al generar la notificacion al propietario: ', error);
+      res.status(500).json({error: 'Error al generar la notificacion al propietario.'});
     }
   }
 }

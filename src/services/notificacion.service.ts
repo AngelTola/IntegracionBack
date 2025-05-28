@@ -321,6 +321,98 @@ export class NotificacionService {
             throw new Error('No se pudo obtener el conteo de notificaciones');
         }
     }
+
+    async notificarDepositoGarantia(reservaId: string): Promise<boolean> {
+        try {
+            const reserva = await prisma.reserva.findUnique({
+                where: { idReserva: reservaId },
+                include: { cliente: true, auto: true }
+            });
+
+            if (!reserva) {
+                console.error(`La reserva ${reservaId} no existe.`);
+                return false;
+            }
+
+            // Verifica si ya existe una notificación para este depósito de garantía
+            const notificacionExistente = await prisma.notificacion.findFirst({
+                where: {
+                    usuarioId: reserva.idCliente,
+                    entidadId: reserva.idReserva,
+                    tipo: 'DEPOSITO_CONFIRMADO', //cambiar
+                    haSidoBorrada: false
+                }
+            });
+
+            if (notificacionExistente) return false;
+
+            let mensaje = `El depósito al vehículo ${reserva.auto.modelo} ${reserva.auto.marca} con placa ${reserva.auto.placa} se ha realizado con exito.\nAtte: REDIBO`;
+
+            await this.crearNotificacion({
+                usuarioId: reserva.idCliente,
+                titulo: 'Depósito exitoso',
+                mensaje,
+                tipo: 'DEPOSITO_CONFIRMADO',
+                prioridad: 'ALTA',
+                entidadId: reserva.idReserva,
+                tipoEntidad: 'Reserva',
+            });
+
+            return true;
+        } catch (error) {
+            console.error('Error al notificar depósito de garantía:', error);
+            return false;
+        }
+    }
+
+    async notificarDepositoGarantiaPropietario(reservaId: string): Promise<boolean> {
+        try{
+            const reserva = await prisma.reserva.findUnique({
+                where: {idReserva: reservaId},
+                include: {
+                    auto: {
+                        include: {
+                            propietario: true
+                        }
+                    },
+                    cliente: true
+                }
+            });
+
+            if(!reserva || !reserva.auto?.propietario){
+                console.error(`La reserva ${reservaId} o el propietario no existen.`);
+                return false;
+            }
+
+            const notificacionExistente = await prisma.notificacion.findFirst({
+                where: {
+                    usuarioId: reserva.auto.propietario.id,
+                    entidadId: reserva.idReserva,
+                    tipo: "DEPOSITO_CONFIRMADO",
+                    haSidoBorrada: false
+                }
+            });
+
+            if(notificacionExistente) return false;
+
+            const mensaje = `El usuario ${reserva.cliente.nombre} ${reserva.cliente.apellido} ha realizado el deposito para la reserva del vehiculo ${reserva.auto.modelo} ${reserva.auto.marca} con placa ${reserva.auto.placa}. \nAtte: REDIBO.`;
+            await this.crearNotificacion({
+                usuarioId: reserva.auto.propietario.id,
+                titulo: 'Depósito Recibido',
+                mensaje,
+                tipo: 'DEPOSITO_CONFIRMADO',
+                prioridad: 'ALTA',
+                entidadId: reserva.idReserva,
+                tipoEntidad: 'Reserva',
+
+            });
+
+            return true;
+        } catch(error){
+            console.error('Error al notificar el deposito de la garantia al propietario: ', error);
+            return false;
+        }
+    }
 }
 
 export async function obtenerNoLeidas(userId: string) {
@@ -619,7 +711,7 @@ export async function notificarReservaCancelada(reservaId: string): Promise<bool
             }
         });
 
-        if (notificacionExistente) return false;
+        if (notificacionExistente || reserva.estaPagada) return false;
 
         let mensaje = `Su reserva del vehículo ${reserva.auto.modelo} ${reserva.auto.marca} (placa ${reserva.auto.placa}) ha sido cancelada por no completar el pago restante.`;
         if (reserva.fechaLimitePago) {
