@@ -37,7 +37,7 @@ router.get(
     session: false,
   }),
   (req, res) => {
-    const user = req.user as { id_usuario: number; email: string; nombre_completo: string };
+    const user = req.user as { idUsuario: number; email: string; nombreCompleto: string };
     const info = req.authInfo as { message?: string; token?: string; email?: string };
     
     console.log("🔁 CALLBACK GOOGLE:");
@@ -54,9 +54,9 @@ router.get(
 
     // ✅ Caso: cuenta nueva, requiere completar perfil
     const token = generateToken({
-      id_usuario: user.id_usuario,
+      idUsuario: user.idUsuario,
       email: user.email,
-      nombre_completo: user.nombre_completo,
+      nombreCompleto: user.nombreCompleto,
     });
 
     console.log("🧩 Usuario nuevo, redirigiendo a completar perfil");
@@ -81,13 +81,13 @@ router.get("/auth/failure", (req, res) => {
 router.post("/register", validateRegister, register);
 router.post("/login", validateLogin, login);
 router.get("/me", isAuthenticated, me);
-router.get("/user-profile/:id_usuario", getUserProfile);
+router.get("/user-profile/:idUsuario", getUserProfile);
 
 //foto de perfil actualizar/eliminar
 router.post(
   "/upload-profile-photo",
   authMiddleware,
-  upload.single("foto_perfil"),
+  upload.single("fotoPerfil"),
   uploadProfilePhoto
 );
 router.delete("/delete-profile-photo", authMiddleware, deleteProfilePhoto);

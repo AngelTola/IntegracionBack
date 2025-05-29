@@ -7,11 +7,11 @@ export const obtenerRentersDisponibles = async (req: Request, res: Response) => 
   try {
     const renters = await prisma.usuario.findMany({
       select: {
-        id_usuario: true,
-        nombre_completo: true,
+        idUsuario: true,
+        nombreCompleto: true,
         email: true,
         telefono: true,
-        foto_perfil: true 
+        fotoPerfil: true 
       }
     });
 

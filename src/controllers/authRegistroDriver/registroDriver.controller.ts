@@ -9,10 +9,10 @@ export const registrarDriverController = async (
     const {
       sexo,
       telefono,
-      nro_licencia,
-      categoria,
-      fecha_emision,
-      fecha_vencimiento,
+      licencia,
+      tipoLicencia,
+      fechaEmision,
+      fechaExpiracion,
       anversoUrl,
       reversoUrl,
       rentersIds,
@@ -28,7 +28,7 @@ export const registrarDriverController = async (
     }
 
     const usuario = req.user;
-    if (!usuario || typeof usuario !== "object" || !("id_usuario" in usuario)) {
+    if (!usuario || typeof usuario !== "object" || !("idUsuario" in usuario)) {
       console.error("Usuario no autenticado o inválido:", usuario);
       console.log("🔴 Respuesta del backend:", res.status);
       return;
@@ -36,13 +36,13 @@ export const registrarDriverController = async (
 
 
     await registrarDriverCompleto({
-      id_usuario: Number((usuario as any).id_usuario),
+      idUsuario: Number((usuario as any).idUsuario),
       sexo,
       telefono,
-      nro_licencia,
-      categoria,
-      fecha_emision: new Date(fecha_emision),
-      fecha_vencimiento: new Date(fecha_vencimiento),
+      licencia,
+      tipoLicencia,
+      fechaEmision: new Date(fechaEmision),
+      fechaExpiracion: new Date(fechaExpiracion),
       anversoUrl,
       reversoUrl,
       rentersIds,

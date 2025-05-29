@@ -1,3 +1,4 @@
+//
 import { Request, Response } from "express";
 import { registrarHostCompleto } from "../../services/pago.service";
 import { uploadToCloudinary } from "../../services/upload.service"; // ⬅ nuevo import
@@ -7,13 +8,13 @@ export const registrarHostCompletoController = async (
   res: Response
 ): Promise<void> => {
   try {
-    const usuario = req.user as { id_usuario: number };
+    const usuario = req.user as { idUsuario: number };
     const {
       placa,
       soat,
       tipo,
-      numero_tarjeta,
-      fecha_expiracion,
+      numeroTarjeta,
+      fechaExpiracion,
       titular,
       detalles_metodo,
     } = req.body;
@@ -33,11 +34,11 @@ export const registrarHostCompletoController = async (
 
     const tipoFinal =
       tipo === "card"
-        ? "tarjeta"
-        : tipo === "qr"
-        ? "qr"
+        ? "TARJETA_DEBITO"
+        : tipo === "QR"
+        ? "QR"
         : tipo === "cash"
-        ? "efectivo"
+        ? "EFECTIVO"
         : null;
 
     if (!tipoFinal) {
@@ -50,23 +51,23 @@ export const registrarHostCompletoController = async (
     );
 
     // ⬇ Subida de imagen QR si existe
-    let imagen_qr: string | undefined = undefined;
+    let imagenQr: string | undefined = undefined;
     if (qrFile) {
-      imagen_qr = await uploadToCloudinary(qrFile);
+      imagenQr = await uploadToCloudinary(qrFile);
     }
 
     // ⬇ Registrar en BD usando servicio existente
     await registrarHostCompleto({
-      id_usuario: usuario.id_usuario,
+      idUsuario: usuario.idUsuario,
       placa,
       soat,
       imagenes: imagenesSubidas, // ahora son URLs, no filenames
       tipo: tipoFinal,
-      numero_tarjeta,
-      fecha_expiracion,
+      numeroTarjeta,
+      fechaExpiracion,
       titular,
-      imagen_qr,
-      detalles_metodo_pago: detalles_metodo,
+      imagenQr,
+      detallesMetodoPago: detalles_metodo,
     });
 
     // ✅ No retornes res.status(...), simplemente termina con void

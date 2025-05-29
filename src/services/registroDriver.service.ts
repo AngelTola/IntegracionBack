@@ -6,25 +6,25 @@ const prisma = new PrismaClient();
  * @param data Datos del driver + lista de IDs de renters
  */
 export const registrarDriverCompleto = async (data: {
-  id_usuario: number;
+  idUsuario: number;
   sexo: string;
   telefono: string;
-  nro_licencia: string;
-  categoria: string;
-  fecha_emision: Date;
-  fecha_vencimiento: Date;
+  licencia: string;
+  tipoLicencia: string;
+  fechaEmision: Date;
+  fechaExpiracion: Date;
   anversoUrl: string;
   reversoUrl: string;
   rentersIds: number[];
 }) => {
   const {
-    id_usuario,
+    idUsuario,
     sexo,
     telefono,
-    nro_licencia,
-    categoria,
-    fecha_emision,
-    fecha_vencimiento,
+    licencia,
+    tipoLicencia,
+    fechaEmision,
+    fechaExpiracion,
     anversoUrl,
     reversoUrl,
     rentersIds
@@ -36,7 +36,7 @@ export const registrarDriverCompleto = async (data: {
 
   // Verificar si el usuario ya tiene teléfono registrado
   const usuario = await prisma.usuario.findUnique({
-    where: { id_usuario },
+    where: { idUsuario },
     select: { telefono: true }
   });
 
@@ -46,13 +46,13 @@ export const registrarDriverCompleto = async (data: {
     // 1. Crear al driver
     prisma.driver.create({
       data: {
-        id_usuario,
+        idUsuario,
         sexo,
         telefono: telefonoFinal,
-        nro_licencia,
-        categoria,
-        fecha_emision,
-        fecha_vencimiento,
+        licencia,
+        tipoLicencia,
+        fechaEmision,
+        fechaExpiracion,
         anversoUrl,
         reversoUrl
       }
@@ -63,23 +63,23 @@ export const registrarDriverCompleto = async (data: {
       ? [] // ya tiene, no actualizamos
       : [
           prisma.usuario.update({
-            where: { id_usuario },
-            data: { telefono: Number(telefono) }
+            where: { idUsuario },
+            data: { telefono: String(telefono) }
           })
         ]),
 
     // 3. Marcar al usuario como driver (driverBool = true)
     prisma.usuario.update({
-      where: { id_usuario },
+      where: { idUsuario },
       data: { driverBool: true }
     }),
 
     // 4. Asignar renters
     ...rentersIds.map((renterId) =>
       prisma.usuario.update({
-        where: { id_usuario: renterId },
+        where: { idUsuario: renterId },
         data: {
-          assignedToDriver: id_usuario
+          assignedToDriver: idUsuario
         }
       })
     )
