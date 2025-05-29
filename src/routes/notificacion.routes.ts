@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { NotificacionController, generarNotificacionRentaConcluida, 
          generarNotificacionRentaCancelada, generarNotificacionNuevaCalificacion, 
-         generarNotificacionReservaConfirmada, generarNotificacionReservaCancelada} from '../controllers/notificacion.controller';
-import { cambiarEstadoReserva } from '../controllers/notificacion.controller';
+         generarNotificacionReservaConfirmada, generarNotificacionReservaCancelada, cambiarEstadoReserva } from '../controllers/notificacion.controller';
 import { SSEController } from '../controllers/sse.controller';
 import { SSEService } from '../services/sse.service';
 import { NotificacionService } from '../services/notificacion.service';
@@ -74,6 +73,12 @@ export const createNotificacionRoutes = () => {
   router.post(
     '/generar-notificacion-calificacion/:rentaId', 
     generarNotificacionNuevaCalificacion
+  );
+
+  // generar notificación de comentario con calificación
+  router.post(
+    '/generar-notificacion-comentario/:comentarioId',
+    notificacionController.generarNotificacionComentarioCalificacion.bind(notificacionController) as any
   );
 
   router.post(

@@ -168,6 +168,63 @@ export class NotificacionController {
       res.status(500).json({error: 'Error al generar la notificacion al propietario.'});
     }
   }
+
+  async generarNotificacionComentarioCalificacion(req: Request, res: Response) {
+    try {
+      const { comentarioId } = req.params;
+      
+      // Buscar el comentario y sus relaciones necesarias
+      const comentario = await prisma.comentario.findUnique({
+        where: { idComentario: parseInt(comentarioId) },
+        include: {
+          auto: {
+            include: {
+              propietario: true
+            }
+          },
+          usuario: true,
+          calificacion: true, // Incluir calificación para obtener la puntuación si existe
+          reserva: true
+        }
+      });
+
+      if (!comentario) {
+        return res.status(404).json({ error: 'Comentario no encontrado' });
+      }
+
+      // Asegurarse de que el auto y su propietario existan
+      if (!comentario.auto || !comentario.auto.propietario) {
+          console.error(`Auto o propietario no encontrados para el comentario ${comentarioId}`);
+          return res.status(500).json({ error: 'Información relacionada faltante' });
+      }
+
+      // Crear la notificación en la base de datos
+      const notificacionData = {
+        usuarioId: comentario.auto.propietario.id,
+        titulo: 'Comentario Recibido',
+        // Mensaje que incluye información relevante
+        mensaje: `La experiencia con el vehiculo ${comentario.auto.marca}, ${comentario.auto.modelo}  fue.
+        ${comentario.calificacion ? 'calificacion de ' + comentario.calificacion.puntuacion + ' estrellas' : ''}
+        Comentario: ${comentario.contenido}
+        `,
+        tipo: TipoDeNotificacion.VEHICULO_CALIFICADO,
+        prioridad: PrioridadNotificacion.MEDIA,
+        entidadId: comentario.idComentario.toString(), // Usar el ID del comentario
+        tipoEntidad: 'COMENTARIO'
+      };
+
+      const notificacion = await this.notificacionService.crearNotificacion(notificacionData);
+
+      return res.status(200).json({
+        message: 'Notificación de comentario generada exitosamente',
+        notificacion
+      });
+
+    } catch (error) {
+      console.error('Error al generar notificación de comentario:', error);
+      return res.status(500).json({ error: 'Error al generar la notificación de comentario' });
+    }
+  }
 }
 
 /**

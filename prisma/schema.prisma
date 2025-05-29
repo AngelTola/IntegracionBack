@@ -60,6 +60,7 @@ model Usuario {
   rentas         Renta[]        @relation("UsuarioRentas")
   reservas       Reserva[]      @relation("UsuarioReservas")
   autos          Auto[]         @relation("UsuarioAutos")
+  comentarios    Comentario[]
 }
 
 model Notificacion {
@@ -121,6 +122,7 @@ model Auto {
   propietario       Usuario    @relation("UsuarioAutos", fields: [propietarioId], references: [id], onDelete: Cascade)
   reservas          Reserva[]
   rentas            Renta[]    @relation("AutoRentas")
+  comentarios       Comentario[]
 }
 
 model Reserva {
@@ -138,6 +140,7 @@ model Reserva {
   montoPagado     Decimal       @default(0.00) @db.Decimal(10, 2)
   estaPagada      Boolean       @default(false)
   renta           Renta?
+  comentarios     Comentario[]
 
   @@unique([idCliente, autoId, fechaInicio], name: "reservaUnicaClienteAutoFecha")
   @@index([idCliente])
@@ -153,6 +156,32 @@ model Calificacion {
   fechaCreacion DateTime @default(now())
   
   renta         Renta    @relation(fields: [rentaId], references: [id], onDelete: Cascade)
+  comentario   Comentario[]
 
   @@index([rentaId])
 }
+
+model Comentario {
+  idComentario  Int      @id @default(autoincrement())
+  contenido     String   @db.Text
+  fechaCreacion DateTime @default(now())
+  
+  // Relaciones
+  idAuto        String
+  auto          Auto     @relation(fields: [idAuto], references: [id], onDelete: Cascade)
+  
+  idUsuario     String
+  usuario       Usuario  @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+  
+  idCalificacion String?
+  calificacion   Calificacion? @relation(fields: [idCalificacion], references: [id], onDelete: SetNull)
+  
+  idReserva     String?
+  reserva       Reserva? @relation(fields: [idReserva], references: [idReserva], onDelete: SetNull)
+
+  @@index([idAuto])
+  @@index([idUsuario])
+  @@index([idCalificacion])
+  @@index([idReserva])
+}
+
