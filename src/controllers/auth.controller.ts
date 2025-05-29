@@ -8,7 +8,7 @@ import { updateGoogleProfile as updateGoogleProfileService } from "../services/a
 const prisma = new PrismaClient();
 
 export const register = async (req: Request, res: Response): Promise<void> => {
-  const { nombre_completo, email, contraseña, fecha_nacimiento, telefono } =
+  const { nombreCompleto, email, contraseña, fechaNacimiento, telefono } =
     req.body;
 
   try {
@@ -20,10 +20,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     }
 
     const newUser = await authService.createUser({
-      nombre_completo,
+      nombreCompleto,
       email,
       contraseña,
-      fecha_nacimiento,
+      fechaNacimiento,
       telefono,
     });
 
@@ -42,7 +42,7 @@ export const updateGoogleProfile = async (
   res: Response
 ): Promise<void> => {
   console.log("📍 REQ.USER:", req.user);
-  const { nombre_completo, fecha_nacimiento, telefono } = req.body;
+  const { nombreCompleto, fechaNacimiento, telefono } = req.body;
   const email = (req.user as { email: string }).email;
 
   if (!email) {
@@ -52,8 +52,8 @@ export const updateGoogleProfile = async (
   try {
     const updatedUser = await authService.updateGoogleProfile(
       email,
-      nombre_completo,
-      fecha_nacimiento,
+      nombreCompleto,
+      fechaNacimiento,
       telefono
     );
     res.json({
@@ -93,9 +93,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     //Token
     const token = generateToken({
-      id_usuario: user.id_usuario,
+      idUsuario: user.idUsuario,
       email: user.email,
-      nombre_completo: user.nombre_completo,
+      nombreCompleto: user.nombreCompleto,
     });
 
     res.json({
@@ -103,7 +103,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       token,
       user: {
         email: user.email,
-        nombre_completo: user.nombre_completo,
+        nombreCompleto: user.nombreCompleto,
       },
     });
     //Cambios por si no funciona lo que implemente
@@ -115,22 +115,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const me = async (req: Request, res: Response): Promise<void> => {
-  const { id_usuario } = req.user as { id_usuario: number };
+  const { idUsuario } = req.user as { idUsuario: number };
 
   try {
     const user = await prisma.usuario.findUnique({
-      where: { id_usuario },
+      where: { idUsuario },
       select: {
-        id_usuario: true,
-        nombre_completo: true,
+        idUsuario: true,
+        nombreCompleto: true,
         email: true,
         telefono: true,
-        fecha_nacimiento: true,
-        foto_perfil: true,
+        fechaNacimiento: true,
+        fotoPerfil: true,
 
-        ediciones_nombre: true,
-        ediciones_telefono: true,
-        ediciones_fecha: true,
+        edicionesNombre: true,
+        edicionesTelefono: true,
+        edicionesFecha: true,
         driverBool: true,
         host: true,
       },
@@ -149,16 +149,16 @@ export const me = async (req: Request, res: Response): Promise<void> => {
 
 export const updateUserField = async (req: Request, res: Response) => {
   const { campo, valor }: { campo: CampoEditable; valor: string } = req.body;
-  const { id_usuario } = req.user as { id_usuario: number };
+  const { idUsuario } = req.user as { idUsuario: number };
 
   if (!campo || !valor) {
     res.status(400).json({ message: "Campo y valor son obligatorios." });
   }
 
   const camposPermitidos = [
-    "nombre_completo",
+    "nombreCompleto",
     "telefono",
-    "fecha_nacimiento",
+    "fechaNacimiento",
   ] as const;
   type CampoEditable = (typeof camposPermitidos)[number];
   if (!camposPermitidos.includes(campo)) {
@@ -166,15 +166,15 @@ export const updateUserField = async (req: Request, res: Response) => {
   }
 
   const campoContadorMap: Record<CampoEditable, keyof Usuario> = {
-    nombre_completo: "ediciones_nombre",
-    telefono: "ediciones_telefono",
-    fecha_nacimiento: "ediciones_fecha",
+    nombreCompleto: "edicionesNombre",
+    telefono: "edicionesTelefono",
+    fechaNacimiento: "edicionesFecha",
   };
   const campoContador = campoContadorMap[campo];
 
   try {
     const user = (await prisma.usuario.findUnique({
-      where: { id_usuario },
+      where: { idUsuario },
       select: {
         [campo]: true,
         [campoContador]: true,
@@ -196,7 +196,7 @@ export const updateUserField = async (req: Request, res: Response) => {
     const nuevoValor =
       campo === "telefono"
         ? valor.trim()
-        : campo === "fecha_nacimiento"
+        : campo === "fechaNacimiento"
         ? new Date(valor)
         : valor;
 
@@ -208,7 +208,7 @@ export const updateUserField = async (req: Request, res: Response) => {
     }
 
     // Validaciones personalizadas
-    if (campo === "nombre_completo") {
+    if (campo === "nombreCompleto") {
       if (typeof valor !== "string" || valor.length < 3 || valor.length > 50) {
         res
           .status(400)
@@ -250,7 +250,7 @@ export const updateUserField = async (req: Request, res: Response) => {
           .json({ message: "El teléfono debe comenzar con 6 o 7." });
       }
     }
-    if (campo === "fecha_nacimiento") {
+    if (campo === "fechaNacimiento") {
       const fechaValida = Date.parse(valor);
       if (isNaN(fechaValida)) {
         res.status(400).json({ message: "Fecha inválida." });
@@ -258,7 +258,7 @@ export const updateUserField = async (req: Request, res: Response) => {
     }
 
     const updatedUser = await prisma.usuario.update({
-      where: { id_usuario },
+      where: { idUsuario },
       data: {
         [campo]: nuevoValor,
         [campoContador]: { increment: 1 },
@@ -277,7 +277,7 @@ export const updateUserField = async (req: Request, res: Response) => {
 
     res.json({
       message: `$${
-        campo === "nombre_completo"
+        campo === "nombreCompleto"
           ? "Nombre"
           : campo === "telefono"
           ? "Teléfono"
@@ -286,7 +286,7 @@ export const updateUserField = async (req: Request, res: Response) => {
       edicionesRestantes,
       infoExtra,
       user: {
-        id_usuario: updatedUser.id_usuario,
+        idUsuario: updatedUser.idUsuario,
         [campo]: updatedUser[campo],
         [campoContador]: updatedUser[campoContador],
       },
@@ -301,15 +301,15 @@ export const getUserProfile = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const id_usuario = Number(req.params.id_usuario); // Aseguramos que sea número
+  const idUsuario = Number(req.params.idUsuario); // Aseguramos que sea número
 
-  if (isNaN(id_usuario)) {
+  if (isNaN(idUsuario)) {
     res.status(400).json({ message: "ID de usuario inválido" });
     return;
   }
 
   try {
-    const user = await authService.getUserById(id_usuario); // Usamos el servicio
+    const user = await authService.getUserById(idUsuario); // Usamos el servicio
 
     if (!user) {
       res.status(404).json({ message: "Usuario no encontrado" });
@@ -317,11 +317,11 @@ export const getUserProfile = async (
     }
 
     res.status(200).json({
-      id_usuario: user.id_usuario,
-      nombre_completo: user.nombre_completo,
+      idUsuario: user.idUsuario,
+      nombreCompleto: user.nombreCompleto,
       email: user.email,
       telefono: user.telefono,
-      fecha_nacimiento: user.fecha_nacimiento,
+      fechaNacimiento: user.fechaNacimiento,
     });
   } catch (error) {
     console.error("Error al obtener el perfil:", error);

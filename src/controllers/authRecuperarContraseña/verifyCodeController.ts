@@ -45,8 +45,8 @@ export const verifyCode = async (req: Request, res: Response): Promise<void> => 
       data: {} // Provide a valid object, even if empty
     });
 
-    //if ((user?.failedCodeAttempts ?? 0) <= 5){
-    if (!user?.isBlocked){
+    //if ((user?.intentosFallidos ?? 0) <= 5){
+    if (!user?.bloqueado){
       const isCodeValid = user && code.trim() === user.codigoVerificacion;
 
       if (isCodeValid) {
@@ -56,7 +56,7 @@ export const verifyCode = async (req: Request, res: Response): Promise<void> => 
         await prisma.usuario.update({
           where: { email: user?.email ?? '' },
           data: {
-            failedCodeAttempts: 0,
+            intentosFallidos: 0,
           },
         });
          res.status(200).json({ message: 'Código verificado correctamente' });
@@ -65,24 +65,24 @@ export const verifyCode = async (req: Request, res: Response): Promise<void> => 
         updatedUser = await prisma.usuario.update({
           where: { email: user?.email },
           data: {
-            failedCodeAttempts: { increment: 1 },
+            intentosFallidos: { increment: 1 },
           },
         });
-        console.log(`Intentos fallidos: ${updatedUser.failedCodeAttempts}`);
+        console.log(`Intentos fallidos: ${updatedUser.intentosFallidos}`);
         //res.status(400).json({ message: 'Código incorrecto. Por favor intenta nuevamente' });
         //Enviar al usuario al login
 
-        if (updatedUser.failedCodeAttempts === 5) {
-          const blockUntil = new Date(Date.now() + 15 * 60 * 1000); // Bloquear al usuario durante 15 minutos
+        if (updatedUser.intentosFallidos === 5) {
+          const fechaBloqueado = new Date(Date.now() + 15 * 60 * 1000); // Bloquear al usuario durante 15 minutos
           await prisma.usuario.update({
             where: { email: user?.email },
             data: {
-              isBlocked: true,
-              blockuntil: blockUntil,
-              failedCodeAttempts: 0, // Reiniciamos los intentos fallidos
+              bloqueado: true,
+              fechaBloqueado: fechaBloqueado,
+              intentosFallidos: 0, // Reiniciamos los intentos fallidos
             },
           });
-          console.log(`Usuario bloqueado hasta: ${blockUntil.toISOString()}`);
+          console.log(`Usuario bloqueado hasta: ${fechaBloqueado.toISOString()}`);
            res.status(400).json({ message: 'Código incorrecto. Usuario bloqueado temporalmente.' });
         }
          res.status(400).json({ message: 'Código incorrecto. Por favor intenta nuevamente' });

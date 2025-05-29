@@ -33,28 +33,28 @@ export const recoverPassword: RequestHandler = async (req, res) => {
       return;
     }
     // Check if the user is blocked
-    if (user.isBlocked && user.blockuntil && new Date() < user.blockuntil) {
-      console.log(`El usuario ha sido bloquedao hasta: ${user.blockuntil.toISOString()}.`);
-      res.status(400).json({ message:`El usuario ha sido bloquedao hasta: ${user.blockuntil.toISOString()}.` });
+    if (user.bloqueado && user.fechaBloqueado && new Date() < user.fechaBloqueado) {
+      console.log(`El usuario ha sido bloquedao hasta: ${user.fechaBloqueado.toISOString()}.`);
+      res.status(400).json({ message:`El usuario ha sido bloquedao hasta: ${user.fechaBloqueado.toISOString()}.` });
       return;
     }
     // Si el usuario tenía bloqueo, pero ya expiró:
-    if (user.isBlocked && user.blockuntil && new Date() >= user.blockuntil) {
+    if (user.bloqueado && user.fechaBloqueado && new Date() >= user.fechaBloqueado) {
       console.log('🔓 Bloqueo expirado. Restaurando estado del usuario...');
 
       await prisma.usuario.update({
         where: { email: user.email },
         data: {
-          isBlocked: false,
-          blockuntil: null,
-          failedCodeAttempts: 0,
+          bloqueado: false,
+          fechaBloqueado: null,
+          intentosFallidos: 0,
         },
       });
 
       // 💡 Opcional: también podés actualizar el objeto `user` en memoria si lo seguís usando abajo
-      user.isBlocked = false;
-      user.blockuntil = null;
-      user.failedCodeAttempts = 0;
+      user.bloqueado = false;
+      user.fechaBloqueado = null;
+      user.intentosFallidos = 0;
     }
 
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();

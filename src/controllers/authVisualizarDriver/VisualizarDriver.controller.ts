@@ -9,16 +9,16 @@ export const getDriverProfile = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const id_usuario = req.user?.id_usuario;
+  const idUsuario = req.user?.idUsuario;
 
-  if (!id_usuario) {
+  if (!idUsuario) {
     res.status(401).json({ message: "No autorizado: token inválido o ausente" });
     return;
   }
 
   try {
     const driver = await prisma.driver.findUnique({
-      where: { id_usuario },
+      where: { idUsuario },
       include: { usuario: true },
     });
 
