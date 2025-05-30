@@ -37,12 +37,12 @@ passport.use(
         const { user, isNew } = await findOrCreateGoogleUser(email, name);
 
         const token = generateToken({
-          id_usuario: user.id_usuario,
+          idUsuario: user.idUsuario,
           email: user.email,
-          nombre_completo: user.nombre_completo,
+          nombreCompleto: user.nombreCompleto,
         });
 
-        if (user.registrado_con === "email") {
+        if (user.registradoCon === "email") {
           console.warn("⚠️ Correo ya registrado manualmente:", email);
 
           console.log("✅ Usuario autenticado y token generado");

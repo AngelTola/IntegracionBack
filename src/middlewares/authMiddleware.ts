@@ -3,9 +3,9 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 interface JwtPayload {
-  id_usuario: number;
+  idUsuario: number;
   email: string;
-  nombre_completo: string;
+  nombreCompleto: string;
 }
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction): void => {

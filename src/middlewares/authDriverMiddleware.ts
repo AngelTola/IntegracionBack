@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 export interface AuthenticatedRequest extends Request {
-  user?: { id_usuario: number };
+  user?: { idUsuario: number };
 }
 
 export const authDriverMiddleware = (
@@ -22,9 +22,9 @@ export const authDriverMiddleware = (
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET || "clave_secreta"
-    ) as { id_usuario: number };
+    ) as { idUsuario: number };
 
-    req.user = { id_usuario: decoded.id_usuario };
+    req.user = { idUsuario: decoded.idUsuario };
     next();
   } catch (error) {
     return res.status(403).json({ message: "Token inválido" });
