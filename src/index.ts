@@ -17,6 +17,10 @@ import visualizarDriverRoutes from "./routes/visualizarDriver.routes";
 import path from 'path';
 // Cargar variables de entorno
 
+//verificacion en 2 pasos
+import twofaRoutes from './routes/twofa.routes';
+
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -75,6 +79,10 @@ app.use("/api", authRegistroHostRoutes);
 app.use('/api', authRegistroDriverRoutes); // Añadir la ruta de registro de driver aquí
 app.use('/api', usuarioRoutes); // Añadir la ruta de usuario aquí
 app.use('/api', visualizarDriverRoutes);// Añadir la ruta de visualizar driver aquí
+
+//verificacion en 2 pasos
+app.use('/api', twofaRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("¡Hola desde la página principal!");

@@ -133,6 +133,7 @@ export const me = async (req: Request, res: Response): Promise<void> => {
         edicionesFecha: true,
         driverBool: true,
         host: true,
+        verificacionDosPasos: true,
       },
     });
 
