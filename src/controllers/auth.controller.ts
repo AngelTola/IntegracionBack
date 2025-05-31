@@ -68,6 +68,7 @@ export const updateGoogleProfile = async (
   }
 };
 
+// controllers/auth.controller.ts - Modificar la función login
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
@@ -75,23 +76,40 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = await authService.findUserByEmail(email);
 
     if (!user) {
-      res
-        .status(401)
-        .json({ message: "Correo ingresado no se encuentra en el sistema." });
+      res.status(401).json({ message: "Correo ingresado no se encuentra en el sistema." });
       return;
     }
 
-    const isValid = await authService.validatePassword(
-      password,
-      user.contraseña ?? ""
-    );
+    const isValid = await authService.validatePassword(password, user.contraseña ?? "");
 
     if (!isValid) {
       res.status(401).json({ message: "Los datos no son válidos" });
       return;
     }
 
-    //Token
+    // Si tiene 2FA activado, no enviar el token completo aún
+    if (user.verificacionDosPasos) {
+      // Generar un token temporal solo para verificar 2FA
+      const tempToken = generateToken({
+        idUsuario: user.idUsuario,
+        email: user.email,
+        nombreCompleto: user.nombreCompleto,
+        temp2FA: true // Marcador para indicar que es temporal
+      });
+
+      res.json({
+        message: "Requiere verificación 2FA",
+        requires2FA: true,
+        tempToken, // Token temporal para el proceso 2FA
+        user: {
+          email: user.email,
+          nombreCompleto: user.nombreCompleto,
+        }
+      });
+      return;
+    }
+
+    // Login normal sin 2FA
     const token = generateToken({
       idUsuario: user.idUsuario,
       email: user.email,
@@ -100,14 +118,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     res.json({
       message: "Login exitoso",
+      requires2FA: false,
       token,
       user: {
         email: user.email,
         nombreCompleto: user.nombreCompleto,
       },
     });
-    //Cambios por si no funciona lo que implemente
-    //return res.json({ message: "Login exitoso", user: { email: user.email } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error en el servidor" });
