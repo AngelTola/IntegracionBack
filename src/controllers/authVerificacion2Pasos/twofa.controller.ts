@@ -1,3 +1,4 @@
+//controllers/authVerificacion2Pasos/twofa.controller.ts
 import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';
 
@@ -12,6 +13,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const enviarCodigo2FA = async (idUsuario: number, email: string) => {
+
   const codigo = Math.floor(100000 + Math.random() * 900000).toString();
   const expiracion = new Date(Date.now() + 5 * 60 * 1000);
 
@@ -28,9 +30,11 @@ export const enviarCodigo2FA = async (idUsuario: number, email: string) => {
     to: email,
     subject: 'Tu código de verificación en dos pasos',
     text: `Tu código es: ${codigo}. Expira en 5 minutos.`,
+    
   });
 
-  return { message: 'Código enviado correctamente' };
+  return { message: 'Código enviado correctamente',tiempoRestante: 300,
+    enviado: true, };
 };
 
 export const verificarCodigo2FA = async (idUsuario: number, codigo: string) => {
