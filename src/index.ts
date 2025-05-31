@@ -3,16 +3,16 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 dotenv.config();
-import passwordRoutes from "../src/routes/password.routes";
-import authRoutes from "../src/routes/auth.routes";
+import passwordRoutes from "./routes/auth/password.routes";
+import authRoutes from "./routes/auth/auth.routes";
 import session from "express-session";
 import passport from "passport";
 import "../src/config/googleAuth";
-import authRegistroHostRoutes from "../src/routes/registroHost.routes";
-import authRegistroDriverRoutes from './routes/registroDriver.routes'; // Import the driver routes
+import authRegistroHostRoutes from "./routes/auth/registroHost.routes";
+import authRegistroDriverRoutes from './routes/auth/registroDriver.routes'; // Import the driver routes
 import "./config/googleAuth"; // <--- importante
-import usuarioRoutes from './routes/usuario.routes';
-import visualizarDriverRoutes from "./routes/visualizarDriver.routes";
+import usuarioRoutes from './routes/auth/usuario.routes';
+import visualizarDriverRoutes from "./routes/auth/visualizarDriver.routes";
 
 import path from 'path';
 // Cargar variables de entorno

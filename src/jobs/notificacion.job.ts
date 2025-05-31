@@ -6,7 +6,7 @@ import {
   notificarReservaCancelada,
   NotificacionService
 } from '../services/notificacion.service';
-import { SSEService } from '../services/sse.service';
+import { SSEService } from '../services/notificaciones/sse.service';
 
 export class NotificacionJob {
   private static ejecucionFinalizadas = false;
