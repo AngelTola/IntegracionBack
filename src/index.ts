@@ -130,3 +130,9 @@ ensureDefaultUbicacion()
   });
 
 export default app;
+
+
+// Visualizar renters
+import visualizarRentersRoutes from "./routes/visualizarRenters.routes"
+
+app.use("/api", visualizarRentersRoutes);
