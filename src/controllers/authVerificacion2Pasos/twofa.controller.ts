@@ -99,7 +99,6 @@ export const verifyLoginCode = async (idUsuario: number, codigo: string) => {
     data: {
       codigo2FA: null,
       codigo2FAExpira: null,
-      // NO actualizar verificacionDosPasos aquí porque ya está activado
     },
   });
 

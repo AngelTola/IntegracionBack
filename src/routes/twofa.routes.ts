@@ -16,6 +16,6 @@ const prisma = new PrismaClient();
 router.post('/2fa/enviar', requireAuth, handleEnviarCodigo);
 router.post('/2fa/verificar', requireAuth, handleVerificarCodigo);
 router.post('/2fa/desactivar', requireAuth, handleDesactivar2FA);
-router.post('/verificar-login', requireAuth, handleVerifyLoginCode); // NUEVA RUTA
+router.post('/2fa/verificar-login', requireAuth, handleVerifyLoginCode); // NUEVA RUTA
 
 export default router;

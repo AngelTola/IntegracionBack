@@ -41,13 +41,14 @@ export const handleDesactivar2FA = async (req: Request, res: Response) => {
   }
 };
 
-export const handleVerifyLoginCode = async (req: Request, res: Response) => {
+export const handleVerifyLoginCode = async (req: Request, res: Response): Promise<void> => {
   try {
     const { idUsuario } = req.user as { idUsuario: number; temp2FA?: boolean };
     const { codigo } = req.body;
     
     if (!(req.user as any)?.temp2FA) {
-      return res.status(401).json({ message: 'Token inválido' });
+      res.status(401).json({ message: 'Token inválido' });
+      return;
     }
     
     const result = await verifyLoginCode(idUsuario, codigo);

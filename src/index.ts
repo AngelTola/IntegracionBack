@@ -1,3 +1,4 @@
+//src/index.ts
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -81,7 +82,7 @@ app.use('/api', usuarioRoutes); // Añadir la ruta de usuario aquí
 app.use('/api', visualizarDriverRoutes);// Añadir la ruta de visualizar driver aquí
 
 //verificacion en 2 pasos
-app.use('/api', twofaRoutes);
+app.use('/api/', twofaRoutes);
 
 
 app.get("/", (req, res) => {

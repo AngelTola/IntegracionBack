@@ -1,3 +1,4 @@
+//src/controllers/auth.controller.ts
 import { PrismaClient, Usuario } from "@prisma/client";
 import { Request, Response } from "express";
 import * as authService from "../services/auth.service";
