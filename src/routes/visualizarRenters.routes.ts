@@ -5,6 +5,7 @@ import { authMiddleware } from "../middlewares/authMiddleware";
 const router = Router();
 //Define una ruta GET en "/driver/renters"
 // Primero se ejecuta el middleware de autenticación
+// Si el usuario está autenticado, se ejecuta el controlador getRentersAsignados
 router.get("/driver/renters", authMiddleware, getRentersAsignados);
 
 
