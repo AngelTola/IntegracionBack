@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const obtenerRentersDeDriver = async (idUsuario: number) => {
-
   const driver = await prisma.driver.findUnique({
     where: { idUsuario },
   });
@@ -12,16 +11,17 @@ export const obtenerRentersDeDriver = async (idUsuario: number) => {
     throw new Error("Driver no encontrado");
   }
 
-  const renters = await prisma.usuario.findMany({
-    where: {
-      assignedToDriver: idUsuario,
+  const relaciones = await prisma.usuarioDriver.findMany({
+    where: { idDriver: idUsuario },
+    include: {
+      usuario: true,
     },
   });
 
-  return renters.map((renter) => ({
-    fecha_suscripcion: renter.fechaRegistro, 
-    nombre: renter.nombreCompleto,
-    telefono: renter.telefono || "",
-    email: renter.email,
+  return relaciones.map((relacion) => ({
+    fecha_suscripcion: relacion.fechaAsignacion,
+    nombre: relacion.usuario.nombreCompleto,
+    telefono: relacion.usuario.telefono || "",
+    email: relacion.usuario.email,
   }));
 };
