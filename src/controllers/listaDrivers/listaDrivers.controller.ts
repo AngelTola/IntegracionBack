@@ -11,7 +11,7 @@ export const getDriversByRenter = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ message: 'No autenticado' });
     }
-
+// Obtenemos los drivers asociados al usuario
     const drivers = await prisma.usuarioDriver.findMany({
       where: {
         idUsuario: userId,
