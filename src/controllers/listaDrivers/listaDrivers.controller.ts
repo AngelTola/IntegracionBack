@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export const getDriversByRenter = async (req: Request, res: Response) => {
   try {
-    const userId = (req.user as JwtPayload)?.id_usuario;
+    const userId = (req.user as JwtPayload)?.idUsuario;
 
     if (!userId) {
       return res.status(401).json({ message: 'No autenticado' });
@@ -32,11 +32,12 @@ export const getDriversByRenter = async (req: Request, res: Response) => {
       },
     });
 
-    const result = drivers.map((d) => ({
-      nombreCompleto: d.driver.usuario.nombreCompleto,
-      telefono: d.driver.usuario.telefono,
-      email: d.driver.usuario.email,
-      fotoPerfil: d.driver.usuario.fotoPerfil,
+    // Adaptamos al formato que espera el frontend
+    const result = drivers.map((relacion) => ({
+      nombreCompleto: relacion.driver.usuario.nombreCompleto,
+      telefono: relacion.driver.usuario.telefono,
+      email: relacion.driver.usuario.email,
+      fechaAsignacion: relacion.fechaAsignacion
     }));
 
     res.status(200).json({ drivers: result });

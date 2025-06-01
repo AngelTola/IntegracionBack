@@ -1,10 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-/**
- * Registra un nuevo driver y asigna una lista de renters.
- * @param data Datos del driver + lista de IDs de renters
- */
 export const registrarDriverCompleto = async (data: {
   idUsuario: number;
   sexo: string;
@@ -34,7 +30,6 @@ export const registrarDriverCompleto = async (data: {
     throw new Error('Debes asignar al menos un renter al driver.');
   }
 
-  // Verificar si el usuario ya tiene teléfono registrado
   const usuario = await prisma.usuario.findUnique({
     where: { idUsuario },
     select: { telefono: true }
@@ -42,9 +37,9 @@ export const registrarDriverCompleto = async (data: {
 
   const telefonoFinal = usuario?.telefono ? String(usuario.telefono) : telefono;
 
-  return await prisma.$transaction([
+  return await prisma.$transaction(async (tx) => {
     // 1. Crear al driver
-    prisma.driver.create({
+    await tx.driver.create({
       data: {
         idUsuario,
         sexo,
@@ -56,34 +51,33 @@ export const registrarDriverCompleto = async (data: {
         anversoUrl,
         reversoUrl
       }
-    }),
+    });
 
-    // 2. Si no tenía teléfono, actualizarlo ahora
-    ...(usuario?.telefono
-      ? [] // ya tiene, no actualizamos
-      : [
-          prisma.usuario.update({
-            where: { idUsuario },
-            data: { telefono: String(telefono) }
-          })
-        ]),
+    // 2. Actualizar teléfono si no tenía
+    if (!usuario?.telefono) {
+      await tx.usuario.update({
+        where: { idUsuario },
+        data: { telefono: String(telefono) }
+      });
+    }
 
-    // 3. Marcar al usuario como driver (driverBool = true)
-    prisma.usuario.update({
+    // 3. Marcar al usuario como driver
+    await tx.usuario.update({
       where: { idUsuario },
       data: { driverBool: true }
-    }),
+    });
 
-    // 4. Asignar renters
-    ...rentersIds.map((renterId) =>
-      prisma.usuario.update({
-        where: { idUsuario: renterId },
+    // 4. Registrar relaciones en UsuarioDriver con fecha
+    for (const renterId of rentersIds) {
+      await tx.usuarioDriver.create({
         data: {
-          assignedToDriver: idUsuario
+          idUsuario: renterId,
+          idDriver: idUsuario, // porque el driver usa su mismo idUsuario
+          fechaAsignacion: new Date()
         }
-      })
-    )
-  ]);
+      });
+    }
+  });
 };
- 
+
 
