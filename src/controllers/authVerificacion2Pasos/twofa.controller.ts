@@ -60,8 +60,20 @@ export const verificarCodigo2FA = async (idUsuario: number, codigo: string) => {
       verificacionDosPasos: true,
     },
   });
+  const token = generateToken({
+    idUsuario: user.idUsuario,
+    email: user.email,
+    nombreCompleto: user.nombreCompleto,
+  });
 
-  return { message: 'Verificación exitosa' };
+  return { 
+    message: 'Verificación exitosa',
+    token,
+    user: {
+      email: user.email,
+      nombreCompleto: user.nombreCompleto,
+    }
+  };
 };
 
 // En twofa.routeHandlers.ts
