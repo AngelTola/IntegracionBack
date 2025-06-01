@@ -1,3 +1,4 @@
+//src/index.ts
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -19,6 +20,10 @@ import listaDriversRoutes from './routes/listaDrivers.routes';
 
 // Google Auth
 import "../src/config/googleAuth";
+
+//verificacion en 2 pasos
+import twofaRoutes from './routes/twofa.routes';
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -100,7 +105,10 @@ app.use("/api", usuarioRoutes);
 app.use("/api", visualizarDriverRoutes);
 app.use("/api", listaDriversRoutes);
 
-// Endpoint principal
+//verificacion en 2 pasos
+app.use('/api/', twofaRoutes);
+
+
 app.get("/", (req, res) => {
   res.send("¡Hola desde la página principal!");
 });
