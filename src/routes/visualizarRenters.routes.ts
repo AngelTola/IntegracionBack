@@ -8,5 +8,5 @@ const router = Router();
 // Si el usuario está autenticado, se ejecuta el controlador getRentersAsignados
 router.get("/driver/renters", authMiddleware, getRentersAsignados);
 
-
+// Exporta el router para que pueda ser usado en el archivo principal de rutas del servidor
 export default router;
