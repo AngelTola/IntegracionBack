@@ -3,7 +3,7 @@ import { getRentersAsignados } from "../controllers/authVisualizarListaRenters/v
 import { authMiddleware } from "../middlewares/authMiddleware"; 
 
 const router = Router();
-
+//Define una ruta GET en "/driver/renters"
 router.get("/driver/renters", authMiddleware, getRentersAsignados);
 
 
