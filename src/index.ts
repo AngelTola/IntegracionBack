@@ -15,6 +15,7 @@ import authRegistroHostRoutes from "../src/routes/registroHost.routes";
 import authRegistroDriverRoutes from "./routes/registroDriver.routes";
 import usuarioRoutes from "./routes/usuario.routes";
 import visualizarDriverRoutes from "./routes/visualizarDriver.routes";
+import listaDriversRoutes from './routes/listaDrivers.routes';
 
 // Google Auth
 import "../src/config/googleAuth";
@@ -97,6 +98,7 @@ app.use("/api", authRegistroHostRoutes);
 app.use("/api", authRegistroDriverRoutes);
 app.use("/api", usuarioRoutes);
 app.use("/api", visualizarDriverRoutes);
+app.use("/api", listaDriversRoutes);
 
 // Endpoint principal
 app.get("/", (req, res) => {
