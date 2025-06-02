@@ -3,6 +3,7 @@ import { NotificacionController } from '../../controllers/notificaciones/notific
 import { SSEController } from '../../controllers/notificaciones/sse.controller';
 import { SSEService } from '../../services/notificaciones/sse.service';
 import { NotificacionService } from '../../services/notificaciones/notificacion.service';
+import { requireAuth } from '../../middlewares/auth/authMiddleware';
 
 const sseService = SSEService.getInstance();
 const notificacionService = new NotificacionService();
@@ -12,46 +13,51 @@ const sseController = new SSEController(sseService);
 export const createNotificacionRoutes = () => {
   const router = Router();
 
-  // Endpoint para conexión SSE
+  // SSE conexion
   router.get(
-    '/sse/:usuarioId',
+    '/sse/connect',
     (req, res) => sseController.conectar(req, res)
   );
 
-  // Rutas existentes
   router.get(
     '/', 
-    (req, res) => { res.status(200).json({ message: 'Notification API is running' });
-  });
+    (req, res) => { res.status(200).json({ message: 'Notification API is running' }); }
+  );
 
-  // panel de notificaciones
+  // Panel notificaciones
   router.get(
-    '/panel-notificaciones/:usuarioId',
+    '/panel-notificaciones',
+    requireAuth,
     (req, res) => notificacionController.obtenerPanelNotificaciones(req, res)
   );
 
-  // eliminar notificación
+  // Eliminar notificacion
   router.delete(
     '/eliminar-notificacion/:id',
+    requireAuth,
     (req, res) => notificacionController.eliminarNotificacion(req, res)
   );
 
-  // detalle de una notificación
+  // Detalle de notificacion
   router.get(
     '/detalle-notificacion/:id',
+    requireAuth,
     (req, res) => notificacionController.obtenerDetalleNotificacion(req, res)
   );
 
-  // marcar notificación como leída
+  // Notificacion leida
   router.put(
-    '/notificacion-leida/:id/:usuarioId',
+    '/notificacion-leida/:id',
+    requireAuth,
     (req, res) => notificacionController.marcarComoLeida(req, res)
   );
 
-  //obtener conteo de notificaciones no leidas
+  // Obtener conteo no leidas
   router.get(
-    '/notificaciones-no-leidas/:usuarioId',
+    '/notificaciones-no-leidas',
+    requireAuth,
     (req, res) => notificacionController.obtenerConteoNoLeidas(req, res)
   );
+
   return router;
 };

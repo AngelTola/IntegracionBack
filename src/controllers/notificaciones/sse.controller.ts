@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { SSEService } from '../../services/notificaciones/sse.service';
-import { RequestUtils } from '../../utils/notificaciones/request.noti.utils';
+import { JWTUtils } from '../../utils/notificaciones/jwt.utils';
 
 export class SSEController {
   private sseService: SSEService;
@@ -11,20 +11,23 @@ export class SSEController {
 
   conectar = (req: Request, res: Response): void => {
     try {
-      const { usuarioId, error } = RequestUtils.extractAndValidateUsuarioId(req, 'params');
+      // CAMBIO PRINCIPAL: Extraer idUsuario del JWT
+      const { idUsuario, userInfo, error } = JWTUtils.extractAndValidateUser(req);
       
       if (error) {
-        res.status(400).json({ error });
+        res.status(401).json({ error });
         return;
       }
 
-      if (!usuarioId) {
-        res.status(400).json({ error: 'ID de usuario requerido' });
+      if (!idUsuario || !userInfo) {
+        res.status(401).json({ error: 'Usuario no autenticado' });
         return;
       }
 
-      console.log(`Iniciando conexión SSE para usuario ${usuarioId}`);
-      this.sseService.conectarCliente(usuarioId, req, res);
+      console.log(`Iniciando conexión SSE para usuario autenticado: ${userInfo.nombreCompleto} (ID: ${idUsuario})`);
+      
+      // Usar idUsuario del JWT (garantizado como válido)
+      this.sseService.conectarCliente(idUsuario, req, res);
       
     } catch (error) {
       console.error('Error al conectar cliente SSE:', error);
@@ -34,9 +37,22 @@ export class SSEController {
 
   obtenerEstadisticas = (req: Request, res: Response): void => {
     try {
+      // También proteger estadísticas con JWT
+      const { idUsuario, userInfo, error } = JWTUtils.extractAndValidateUser(req);
+      
+      if (error) {
+        res.status(401).json({ error });
+        return;
+      }
+
       const estadisticas = {
         clientesConectados: this.sseService.listarClientesConectados(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        usuarioActual: {
+          id: idUsuario,
+          nombre: userInfo?.nombreCompleto,
+          email: userInfo?.email
+        }
       };
       
       res.json(estadisticas);
@@ -48,20 +64,23 @@ export class SSEController {
 
   desconectarCliente = (req: Request, res: Response): void => {
     try {
-      const { usuarioId, error } = RequestUtils.extractAndValidateUsuarioId(req, 'params');
+      // Solo puede desconectarse a sí mismo (basado en JWT)
+      const { idUsuario, userInfo, error } = JWTUtils.extractAndValidateUser(req);
       
       if (error) {
-        res.status(400).json({ error });
+        res.status(401).json({ error });
         return;
       }
 
-      if (!usuarioId) {
-        res.status(400).json({ error: 'ID de usuario requerido' });
+      if (!idUsuario) {
+        res.status(401).json({ error: 'Usuario no autenticado' });
         return;
       }
 
-      this.sseService.desconectarCliente(usuarioId);
-      res.json({ mensaje: `Usuario ${usuarioId} desconectado exitosamente` });
+      this.sseService.desconectarCliente(idUsuario);
+      res.json({ 
+        mensaje: `Usuario ${userInfo?.nombreCompleto} (${idUsuario}) desconectado exitosamente` 
+      });
       
     } catch (error) {
       console.error('Error al desconectar cliente:', error);
