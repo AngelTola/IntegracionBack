@@ -21,6 +21,11 @@ model Usuario {
   driverBool         Boolean       @default(false)
   fotoPerfil         String? @db.VarChar(255)
   codigoVerificacion String?
+  //Autenticacion en 2 pasos
+  verificacionDosPasos Boolean @default(false)
+  codigo2FA           String?   @db.VarChar(6)
+  codigo2FAExpira     DateTime?
+
   bloqueado          Boolean   @default(false)
   fechaBloqueado     DateTime?
   intentosFallidos   Int       @default(0)

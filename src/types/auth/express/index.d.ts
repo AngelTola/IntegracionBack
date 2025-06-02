@@ -1,3 +1,4 @@
+//types/express/index.d.ts
 import { JwtPayload } from 'jsonwebtoken';
 
 declare global {

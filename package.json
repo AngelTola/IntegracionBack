@@ -23,7 +23,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.7.1",
   "dependencies": {
-    "@prisma/client": "^6.6.0",
+    "@prisma/client": "^6.8.2",
     "@sendgrid/mail": "^8.1.5",
     "@types/uuid": "^10.0.0",
     "bcrypt": "^5.1.1",
@@ -41,6 +41,7 @@
     "nodemailer": "^6.10.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "rediboback": "file:",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
