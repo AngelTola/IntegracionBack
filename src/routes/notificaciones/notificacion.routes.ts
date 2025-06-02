@@ -1,12 +1,9 @@
 import { Router } from 'express';
-import { NotificacionController, generarNotificacionRentaConcluida, 
-         generarNotificacionRentaCancelada, generarNotificacionNuevaCalificacion, 
-         generarNotificacionReservaConfirmada, generarNotificacionReservaCancelada, cambiarEstadoReserva } from '../controllers/notificacion.controller';
-import { SSEController } from '../controllers/sse.controller';
-import { SSEService } from '../services/notificaciones/sse.service';
-import { NotificacionService } from '../services/notificacion.service';
+import { NotificacionController } from '../../controllers/notificaciones/notificacion.controller';
+import { SSEController } from '../../controllers/notificaciones/sse.controller';
+import { SSEService } from '../../services/notificaciones/sse.service';
+import { NotificacionService } from '../../services/notificaciones/notificacion.service';
 
-// Usar la instancia única del servicio SSE
 const sseService = SSEService.getInstance();
 const notificacionService = new NotificacionService();
 const notificacionController = new NotificacionController(notificacionService);
@@ -55,62 +52,6 @@ export const createNotificacionRoutes = () => {
   router.get(
     '/notificaciones-no-leidas/:usuarioId',
     (req, res) => notificacionController.obtenerConteoNoLeidas(req, res)
-  );
-
-  // generar notificación de renta finalizada
-  router.post(
-    '/generar-renta-concluida/:rentaId',
-    generarNotificacionRentaConcluida
-  );
-
-  // generar notificacion de renta cancelada
-  router.post(
-    '/generar-renta-cancelada/:rentaId',
-    generarNotificacionRentaCancelada
-  );
-
-  // generar notificación de nueva calificación para un vehículo
-  router.post(
-    '/generar-notificacion-calificacion/:rentaId', 
-    generarNotificacionNuevaCalificacion
-  );
-
-  // generar notificación de comentario con calificación
-  router.post(
-    '/generar-notificacion-comentario/:comentarioId',
-    notificacionController.generarNotificacionComentarioCalificacion.bind(notificacionController) as any
-  );
-
-  router.post(
-    '/generar-reserva-confirmada/:reservaId',
-    generarNotificacionReservaConfirmada
-  );
-
-  // obtener notificaciones para el dropdown (> 3)
-  router.get(
-    '/dropdown-notificaciones/:usuarioId',
-    (req, res) => notificacionController.obtenerNotificacionesDropdown(req, res)
-  );
-
-  router.put(
-    '/cambiar-estado-reserva/:reservaId', 
-    cambiarEstadoReserva
-  );
-
-  router.post(
-    '/generar-reserva-cancelada/:reservaId',
-    generarNotificacionReservaCancelada
-  );
-
-  router.post(
-    '/generar-deposito-garantia/:reservaId',
-    (req, res) => notificacionController.generarNotificacionDepositoGarantia(req, res)
-  );
-
-
-  router.post(
-    '/generar-deposito-garantia-propietario/:reservaId',
-    (req, res) => notificacionController.generarNotificacionDepositoGarantiaPropietario(req, res)
   );
   return router;
 };
