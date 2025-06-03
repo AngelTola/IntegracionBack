@@ -9,11 +9,11 @@ import session from "express-session";
 import passport from "passport";
 import authRegistroHostRoutes from './routes/registroHost.routes';
 import authRegistroDriverRoutes from './routes/registroDriver.routes'; // Import the driver routes
-import "./config/googleAuth"; // <--- importante
+//import "./config/googleAuth"; // <--- importante
 import usuarioRoutes from './routes/usuario.routes';
 import visualizarDriverRoutes from "./routes/visualizarDriver.routes";
 import autoRoutes from "./routes/auto.routes";
-
+import mapaRoutes from "../src/routes/filtroMapaPrecioRoutes";
 import path from 'path';
 // Cargar variables de entorno
 
@@ -62,7 +62,7 @@ app.use('/api', authRegistroDriverRoutes); // Añadir la ruta de registro de dri
 app.use('/api', usuarioRoutes); // Añadir la ruta de usuario aquí
 app.use('/api', visualizarDriverRoutes);// Añadir la ruta de visualizar driver aquí
 app.use('/api', autoRoutes);
-
+app.use('/api', mapaRoutes);
 app.get('/', (req, res) => {
   res.send('Bienvenido al back de REDIBO');
 });
