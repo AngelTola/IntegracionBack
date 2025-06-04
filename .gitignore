@@ -19,3 +19,8 @@ pnpm-lock.yaml
 .env.local
 
 coverage
+uploadsperfil-firebase-adminsdk-*.json
+
+uploads/
+uploads/*
+uploads/** */
