@@ -1,14 +1,13 @@
+generator client {
+  provider = "prisma-client-js"
+}
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Usuario {
-  idUsuario         Int           @id @default(autoincrement())
+  idUsuario          Int            @id @default(autoincrement())
   nombreCompleto     String        @db.VarChar(100)
   email              String        @unique @db.VarChar(100)
   contraseña         String?       @default("") @db.VarChar(255)
@@ -19,46 +18,44 @@ model Usuario {
   verificado         Boolean       @default(false)
   host               Boolean       @default(false)
   driverBool         Boolean       @default(false)
-  fotoPerfil         String? @db.VarChar(255)
+  fotoPerfil         String?       @db.VarChar(255)
   codigoVerificacion String?
-  //Autenticacion en 2 pasos
-  verificacionDosPasos Boolean @default(false)
-  codigo2FA           String?   @db.VarChar(6)
-  codigo2FAExpira     DateTime?
-  
-  bloqueado          Boolean   @default(false)
-  fechaBloqueado     DateTime?
-  intentosFallidos   Int       @default(0)
-  direccion          String?
-  esAdmin            Boolean            @default(false)
 
-  edicionesNombre    Int       @default(0)
-  edicionesFecha     Int       @default(0)
-  edicionesTelefono  Int      @default(0)
+  //Autenticacion en 2 pasos
+  verificacionDosPasos Boolean     @default(false)
+  codigo2FA            String?     @db.VarChar(6)
+  codigo2FAExpira      DateTime?
+  
+  bloqueado          Boolean       @default(false)
+  fechaBloqueado     DateTime?
+  intentosFallidos   Int           @default(0)
+  direccion          String?
+  esAdmin            Boolean       @default(false)
+
+  edicionesNombre    Int           @default(0)
+  edicionesFecha     Int           @default(0)
+  edicionesTelefono  Int           @default(0)
   
   verificaciones      Verificaciones[]
-  terminosCondiciones Terminos_condiciones[]
-
+  terminosCondiciones TerminosCondiciones[]
   notificaciones      Notificacion[]     
   autos               Auto[]             
   reservas            Reserva[]         
   comentariosEscritos Comentario[]
-  calificacionesRecibidas CalificacionUsuario[] @relation("UsuarioCalificado")
+  calificacionesRecibidas  CalificacionUsuario[] @relation("UsuarioCalificado")
   calificacionesRealizadas CalificacionUsuario[] @relation("UsuarioCalificador")
 
   // Relación con Driver (si este usuario es un driver)
-  driver                 Driver? @relation("UsuarioDriver")
-
+  driver              Driver? @relation("UsuarioDriver")
   // Relación muchos a muchos con drivers asignados
-  driversAsignados       UsuarioDriver[]
+  driversAsignados    UsuarioDriver[]
 
   assignedToDriver Int?
   driverReferente  Driver? @relation("DriverToRenters", fields: [assignedToDriver], references: [idDriver])
 
   // Rentas como cliente
-  rentas              Renta[]
+  //rentas                Renta[]
 
-  // Método de pago directo
   metodoPago            MetodoPago?
   numeroTarjeta         String?                @db.VarChar(16)
   fechaExpiracion       String?                @db.VarChar(5)
@@ -71,7 +68,7 @@ model Usuario {
 
 model Verificaciones {
   idCodigo    Int              @id @default(autoincrement())
-  idUsuario  Int
+  idUsuario   Int
   codigo      String           @db.VarChar(6)
   tipo        TipoVerificacion
   creadoEn    DateTime         @default(now())
@@ -81,9 +78,9 @@ model Verificaciones {
   usuario Usuario @relation(fields: [idUsuario], references: [idUsuario])
 }
 
-model Terminos_condiciones {
+model TerminosCondiciones {
   idAceptacion      Int      @id @default(autoincrement())
-  idUsuario        Int
+  idUsuario         Int
   versionTerminos   String   @db.VarChar(10)
   fechaAceptacion   DateTime
 
@@ -91,27 +88,26 @@ model Terminos_condiciones {
 }
 
 model Driver {
-  idDriver          Int                @id @default(autoincrement())
-  idUsuario        Int                @unique
-  usuario           Usuario            @relation("UsuarioDriver", fields: [idUsuario], references: [idUsuario], onDelete: Cascade)
+  idDriver          Int        @id @default(autoincrement())
+  idUsuario         Int        @unique
+  usuario           Usuario    @relation("UsuarioDriver", fields: [idUsuario], references: [idUsuario], onDelete: Cascade)
   sexo              String
   telefono          String
   licencia          String
-  tipoLicencia      String?
   fechaEmision      DateTime
-  fechaExpiracion   DateTime
-
+  fechaExpiracion   DateTime 
+  tipoLicencia      String?
   añosExperiencia   Int?               
-  disponible        Boolean            @default(true)
+  disponible        Boolean    @default(true)
   
   anversoUrl        String
   reversoUrl        String
 
   asignadoA         UsuarioDriver[]
 
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
   renters           Usuario[] @relation("DriverToRenters")
 
   @@map("drivers")
@@ -127,27 +123,27 @@ model UsuarioDriver {
   
   fechaAsignacion   DateTime           @default(now())       
   
-  @@unique([idUsuario, idDriver])     
-  @@map("usuario_drivers")
+  @@unique([idUsuario, idDriver])  
   @@index([idUsuario])
-  @@index([idDriver])
+  @@index([idDriver])   
+  @@map("usuario_drivers")
 }
 
 model Notificacion {
   idNotificacion  String                @id @default(uuid())
-  idUsuario     Int
-  titulo        String                @db.VarChar(100)
-  mensaje       String
-  idEntidad     String?
-  tipoEntidad   String?               @db.VarChar(50)
-  leido         Boolean               @default(false)
-  leidoEn       DateTime?
-  creadoEn      DateTime              @default(now())
-  actualizadoEn DateTime              @updatedAt
-  haSidoBorrada Boolean               @default(false)
-  tipo          String
-  prioridad     PrioridadNotificacion @default(MEDIA)
-  usuario       Usuario               @relation(fields: [idUsuario], references: [idUsuario], onDelete: Cascade)
+  idUsuario       Int
+  titulo          String                @db.VarChar(100)
+  mensaje         String
+  idEntidad       String?
+  tipoEntidad     String?               @db.VarChar(50)
+  leido           Boolean               @default(false)
+  leidoEn         DateTime?
+  creadoEn        DateTime              @default(now())
+  actualizadoEn   DateTime              @updatedAt
+  haSidoBorrada   Boolean               @default(false)
+  tipo            String
+  prioridad       PrioridadNotificacion @default(MEDIA)
+  usuario         Usuario               @relation(fields: [idUsuario], references: [idUsuario], onDelete: Cascade)
 
   @@unique([idUsuario, idEntidad, tipo], name: "notificacionUnicaUsuarioEntidad")
   @@index([idUsuario])
@@ -156,77 +152,26 @@ model Notificacion {
   @@index([idUsuario, haSidoBorrada])
 }
 
-model Renta {
-  idRenta            String      @id @default(uuid())
-  fechaInicio        DateTime
-  fechaFin           DateTime
-  montoTotal         Decimal     @db.Decimal(10, 2)
-  kilometrajeInicial Int?
-  kilometrajeFinal   Int?
-  estatus            EstadoRenta @default(EN_CURSO)
-  fechaAprobacion    DateTime
-  idReserva          Int         @unique  // Cambiado de String a Int
-  reserva            Reserva     @relation(fields: [idReserva], references: [idReserva], onDelete: Cascade)
-  clienteId          Int         
-  cliente            Usuario     @relation(fields: [clienteId], references: [idUsuario], onDelete: Cascade)
-  idAuto             Int         
-  auto               Auto        @relation(fields: [idAuto], references: [idAuto], onDelete: Cascade)
-  
-  // Relación con calificación
-  calificacion       Calificacion?
-
-  @@index([idRenta])
-  @@index([idReserva])
-}
-
-model Comentario {
-  idComentario      Int                @id @default(autoincrement())
-  idAuto            Int
-  auto              Auto               @relation(fields: [idAuto], references: [idAuto])
-  idUsuario         Int                
-  usuario           Usuario            @relation(fields: [idUsuario], references: [idUsuario])
-  contenido         String?
-  calificacion      Int                @db.SmallInt
-  fechaCreacion     DateTime           @default(now())
-  idReserva         Int?               @unique
-  reserva           Reserva?           @relation(fields: [idReserva], references: [idReserva])
-  
-  // Relación con calificación (removida porque ya no es necesaria)
-  
-  @@map("comentarios")
-}
-
-model Calificacion {
-  idCalificacion String   @id @default(uuid())
-  puntuacion    Int      @db.SmallInt
-  idRenta       String   @unique 
-  renta         Renta    @relation(fields: [idRenta], references: [idRenta], onDelete: Cascade)
-
-  fechaCreacion DateTime @default(now())  
-  
-  // Removido idComentario ya que causaba conflicto
-  
-  @@index([idRenta])
-}
-
 model Ubicacion {
-  idUbicacion       Int                @id @default(autoincrement())
-  nombre            String             @unique
-  descripcion       String?
-  latitud           Float            
-  longitud          Float              
-  esActiva          Boolean            @default(true)
-  autos             Auto[]
+  idUbicacion Int          @id @default(autoincrement())
+  nombre      String       @unique
+  descripcion String?
+  latitud     Float
+  longitud    Float
+  esActiva    Boolean      @default(true)
+  autos       Auto[]
+  tipo        TipoUbicacion @default(ESTANDAR)
+
+
   @@map("ubicaciones")
 }
 
 model Auto {
-  idAuto      Int      @id @default(autoincrement())
+  idAuto      	    Int                @id @default(autoincrement())
   idPropietario     Int
-  idUbicacion Int
-  propietario       Usuario            @relation(fields: [idPropietario], references: [idUsuario])
+  idUbicacion       Int
   ubicacion         Ubicacion          @relation(fields: [idUbicacion], references: [idUbicacion])
-
+  propietario       Usuario            @relation(fields: [idPropietario], references: [idUsuario])
   marca             String
   modelo            String
   descripcion       String?
@@ -235,26 +180,26 @@ model Auto {
   kilometraje       Int                @default(0)
   comentarios       Comentario[]
   calificacionPromedio Float?
-  totalComentarios  Int                @default(0)
-  reservas          Reserva[]
-  disponibilidad    Disponibilidad[]
-  rentas            Renta[]            // Agregada relación con Renta
+  totalComentarios     Int             @default(0)
+  reservas             Reserva[]
+  disponibilidad       Disponibilidad[]
+  //rentas               Renta[]            // Agregada relación con Renta
 
-  tipo        String             
-  año         Int
-  placa       String   @db.VarChar(10)
-  soat        String   @db.VarChar(50)
-  color             String
-  estado            EstadoAuto         @default(ACTIVO) 
-  fechaAdquisicion  DateTime           @default(now())
-  historialMantenimiento HistorialMantenimiento[]
-  imagenes    Imagen[]
-  asientos          Int                @default(5)
-  capacidadMaletero Int                
-  transmision       Transmision       
-  combustible       Combustible        
-  diasTotalRenta     Int?               
-  vecesAlquilado     Int?               
+  tipo        	          String             
+  año                     Int
+  placa                   String             @db.VarChar(10)
+  soat                    String             @db.VarChar(50)
+  color                   String
+  estado                  EstadoAuto         @default(ACTIVO) 
+  fechaAdquisicion        DateTime           @default(now())
+  historialMantenimiento  HistorialMantenimiento[]
+  imagenes                Imagen[]
+  asientos                Int                @default(5)
+  capacidadMaletero       Int                
+  transmision             Transmision       
+  combustible             Combustible        
+  diasTotalRenta          Int?               
+  vecesAlquilado          Int?               
   @@map("autos")
   @@index([idUbicacion])
 }
@@ -289,48 +234,60 @@ model Reserva {
   idCliente         Int
   cliente           Usuario            @relation(fields: [idCliente], references: [idUsuario])
   estado            EstadoReserva      @default(SOLICITADA)
+  idRegistroPagos   Int?                 @unique
+  registroPagos     RegistroPagos?
   fechaSolicitud    DateTime           @default(now())
   fechaAprobacion   DateTime?
-  fechaLimitePago   DateTime           
-  montoTotal        Decimal            @db.Decimal(10, 2) 
+  fechaLimitePago   DateTime
   kilometrajeInicial Int?
   kilometrajeFinal  Int?
-  pagos             Pago[]
-  garantia          Garantia?
-  comentario        Comentario?       
-  estaPagada        Boolean            @default(false) 
+  comentario        Comentario?
   calificacionUsuario CalificacionUsuario?
-  
-  // Relación con Renta
-  renta             Renta?
+  /*montoTotal        Decimal            @db.Decimal(10, 2) 
+  pagos             Pago[]
+  garantia          Garantia?      
+  estaPagada        Boolean            @default(false)
+  renta             Renta?*/
 
   @@map("reservas")
 }
 
+model RegistroPagos {
+  idRegistroPagos Int       @id @default(autoincrement())
+  idReserva       Int       @unique
+  reserva         Reserva   @relation(fields: [idReserva], references: [idReserva])
+  pagos           Pago[]    // Varios pagos, Renta y Garantia
+  montoTotal      Decimal   @db.Decimal(10, 2) 
+  concepto        String    @db.VarChar(100)
+  fechaRegistro   DateTime  @default(now())
+  estaPagado      Boolean   @default(false) // Movido desde Reserva
+
+  @@map("registro_pagos")
+}
+
 model Pago {
-  idPago            Int                @id @default(autoincrement())
-  idReserva         Int
-  reserva           Reserva            @relation(fields: [idReserva], references: [idReserva])
-  monto             Decimal            @db.Decimal(10, 2)
-  fechaPago         DateTime           @default(now())
-  metodoPago        MetodoPago
-  referencia        String?
-  comprobante       String?
-  tipo              TipoPago           @default(RENTA)  
-  
+  idPago          Int           @id @default(autoincrement())
+  idRegistroPagos Int
+  registroPagos   RegistroPagos @relation(fields: [idRegistroPagos], references: [idRegistroPagos])
+  monto           Decimal       @db.Decimal(10, 2)
+  fechaPago       DateTime      @default(now())
+  metodoPago      MetodoPago
+  referencia      String?
+  comprobante     String?
+  tipo            TipoPago      @default(RENTA)
+  // Si es de tipo garantia
+  garantia        Garantia?
+
   @@map("pagos")
 }
 
 model Garantia {
-  idGarantia        Int                @id @default(autoincrement())
-  idReserva         Int                @unique
-  reserva           Reserva            @relation(fields: [idReserva], references: [idReserva])
-  monto             Decimal            @db.Decimal(10, 2)
-  fechaDeposito     DateTime           @default(now())
-  fechaLiberacion   DateTime?
-  estado            EstadoGarantia     @default(DEPOSITADA)
-  comprobante       String?
-  
+  idGarantia      Int            @id @default(autoincrement())
+  idPago          Int            @unique  // Relación 1:1 con Pago
+  pago            Pago           @relation(fields: [idPago], references: [idPago], onDelete: Cascade)
+  fechaLiberacion DateTime?
+  estado          EstadoGarantia @default(DEPOSITADA)
+
   @@map("garantias")
 }
 
@@ -348,6 +305,24 @@ model HistorialMantenimiento {
   @@map("historial_mantenimiento")
 }
 
+model Comentario {
+  idComentario      Int                @id @default(autoincrement())
+  idAuto            Int
+  auto              Auto               @relation(fields: [idAuto], references: [idAuto])
+  idUsuario         Int                
+  usuario           Usuario            @relation(fields: [idUsuario], references: [idUsuario])
+  contenido         String?
+  calificacion      Int                @db.SmallInt
+  fechaCreacion     DateTime           @default(now())
+  idReserva         Int?               @unique
+  reserva           Reserva?           @relation(fields: [idReserva], references: [idReserva])
+  
+  // Relación con calificación (removida porque ya no es necesaria)
+  
+  @@map("comentarios")
+}
+
+
 model CalificacionUsuario {
   idCalificacion    Int                @id @default(autoincrement())
   idCalificador     Int                
@@ -361,20 +336,37 @@ model CalificacionUsuario {
   reserva           Reserva            @relation(fields: [idReserva], references: [idReserva])
   tipoCalificacion  TipoCalificacionUsuario
   
-  @@map("calificaciones_usuarios")
   @@index([idCalificado])
-  @@index([idCalificador])
+  @@index([idCalificador])  
+  @@map("calificaciones_usuarios")
 }
+
+/*model Renta {
+  idRenta            String      @id @default(uuid())
+  fechaInicio        DateTime
+  fechaFin           DateTime
+  montoTotal         Decimal     @db.Decimal(10, 2)
+  kilometrajeInicial Int?
+  kilometrajeFinal   Int?
+  estatus            EstadoRenta @default(EN_CURSO)
+  fechaAprobacion    DateTime
+  idReserva          Int         @unique  // Cambiado de String a Int
+  reserva            Reserva     @relation(fields: [idReserva], references: [idReserva], onDelete: Cascade)
+  clienteId          Int         
+  cliente            Usuario     @relation(fields: [clienteId], references: [idUsuario], onDelete: Cascade)
+  idAuto             Int         
+  auto               Auto        @relation(fields: [idAuto], references: [idAuto], onDelete: Cascade)
+  
+  // Relación con calificación
+  //calificacion       Calificacion?
+
+  @@index([idRenta])
+  @@index([idReserva])
+}*/
 
 enum TipoCalificacionUsuario {
   ARRENDADOR    
   ARRENDATARIO  
-}
-
-enum EstadoRenta {
-  EN_CURSO
-  FINALIZADA
-  CANCELADA
 }
 
 enum EstadoReserva {
@@ -394,9 +386,9 @@ enum EstadoGarantia {
 }
 
 enum MetodoPago {
+  QR
   TARJETA_DEBITO
   EFECTIVO
-  QR
 }
 
 enum Transmision {
@@ -454,4 +446,27 @@ enum RegistradoCon {
 enum TipoVerificacion {
   recuperacion
   verificacion
+}
+
+enum TipoDeNotificacion {
+  RESERVA_SOLICITADA
+  RESERVA_APROBADA
+  RESERVA_RECHAZADA
+  DEPOSITO_CONFIRMADO
+  DEPOSITO_RECIBIDO
+  RESERVA_CANCELADA
+  ALQUILER_FINALIZADO
+  RESERVA_MODIFICADA
+  VEHICULO_CALIFICADO
+}
+
+enum TipoUbicacion {
+  ESTANDAR
+  AEROPUERTO
+}
+
+enum EstadoRenta {
+  EN_CURSO
+  FINALIZADA
+  CANCELADA
 }
