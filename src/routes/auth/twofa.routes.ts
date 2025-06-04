@@ -1,12 +1,12 @@
-// twofa.routes.ts
+//src/routes/auth/twofa.routes.ts
 import { Router } from 'express';
-import { requireAuth } from '../middlewares/authMiddleware';
+import { requireAuth } from '../../middlewares/auth/authMiddleware';
 import { 
   handleEnviarCodigo, 
   handleVerificarCodigo, 
   handleDesactivar2FA, 
   handleVerifyLoginCode // AGREGAR ESTE IMPORT
-} from '../controllers/authVerificacion2Pasos/twofa.routeHandlers';
+} from '../../controllers/auth/authVerificacion2Pasos/twofa.routeHandlers';
 
 import { PrismaClient } from '@prisma/client';
 

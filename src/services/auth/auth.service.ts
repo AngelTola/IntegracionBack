@@ -1,4 +1,4 @@
-//src/services/auth.service.ts
+//src/services/auth/auth.service.ts
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 

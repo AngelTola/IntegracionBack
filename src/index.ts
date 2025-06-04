@@ -19,11 +19,11 @@ import authRegistroHostRoutes from "./routes/auth/registroHost.routes";
 import authRegistroDriverRoutes from "./routes/auth/registroDriver.routes";
 import usuarioRoutes from "./routes/auth/usuario.routes";
 import visualizarDriverRoutes from "./routes/auth/visualizarDriver.routes";
-import listaDriversRoutes from "./routes/listaDrivers.routes";
-import visualizarRentersRoutes from "./routes/visualizarRenters.routes";
+import listaDriversRoutes from "./routes/auth/listaDrivers.routes";
+import visualizarRentersRoutes from "./routes/auth/visualizarRenters.routes";
 
 // Verificación en 2 pasos
-import twofaRoutes from "./routes/twofa.routes";
+import twofaRoutes from "./routes/auth/twofa.routes";
 
 // Servicios y controladores de notificaciones
 import { SSEService } from "./services/notificaciones/sse.service";
@@ -177,10 +177,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// Manejo de rutas no encontradas
-app.use("*", (req: Request, res: Response) => {
-  res.status(404).json({ error: "Ruta no encontrada" });
-});
+
 
 // Manejo de cierre del servidor
 process.on("SIGTERM", () => {

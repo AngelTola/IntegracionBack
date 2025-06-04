@@ -25,7 +25,7 @@ model Usuario {
   verificacionDosPasos Boolean @default(false)
   codigo2FA           String?   @db.VarChar(6)
   codigo2FAExpira     DateTime?
-
+  
   bloqueado          Boolean   @default(false)
   fechaBloqueado     DateTime?
   intentosFallidos   Int       @default(0)
@@ -165,13 +165,14 @@ model Renta {
   kilometrajeFinal   Int?
   estatus            EstadoRenta @default(EN_CURSO)
   fechaAprobacion    DateTime
-  idReserva          Int         @unique
+  idReserva          Int         @unique  // Cambiado de String a Int
   reserva            Reserva     @relation(fields: [idReserva], references: [idReserva], onDelete: Cascade)
   clienteId          Int         
   cliente            Usuario     @relation(fields: [clienteId], references: [idUsuario], onDelete: Cascade)
   idAuto             Int         
   auto               Auto        @relation(fields: [idAuto], references: [idAuto], onDelete: Cascade)
   
+  // Relación con calificación
   calificacion       Calificacion?
 
   @@index([idRenta])
@@ -190,10 +191,8 @@ model Comentario {
   idReserva         Int?               @unique
   reserva           Reserva?           @relation(fields: [idReserva], references: [idReserva])
   
-  // Nueva relación con Calificacion
-  calificacionId    String?            @unique
-  calificacionRenta Calificacion?      @relation(fields: [calificacionId], references: [idCalificacion])
-    
+  // Relación con calificación (removida porque ya no es necesaria)
+  
   @@map("comentarios")
 }
 
@@ -202,11 +201,11 @@ model Calificacion {
   puntuacion    Int      @db.SmallInt
   idRenta       String   @unique 
   renta         Renta    @relation(fields: [idRenta], references: [idRenta], onDelete: Cascade)
-  fechaCreacion DateTime @default(now())
+
+  fechaCreacion DateTime @default(now())  
   
-  // Nueva relación opcional con Comentario
-  comentario    Comentario?
-    
+  // Removido idComentario ya que causaba conflicto
+  
   @@index([idRenta])
 }
 
@@ -239,7 +238,7 @@ model Auto {
   totalComentarios  Int                @default(0)
   reservas          Reserva[]
   disponibilidad    Disponibilidad[]
-  rentas            Renta[]
+  rentas            Renta[]            // Agregada relación con Renta
 
   tipo        String             
   año         Int

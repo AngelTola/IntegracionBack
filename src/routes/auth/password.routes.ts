@@ -1,3 +1,4 @@
+//src/routes/auth/password.routes.ts
 import { Router } from 'express';
 import { recoverPassword } from '../../controllers/auth/authRecuperarContraseña/password.controller';
 import { verifyCode } from '../../controllers/auth/authRecuperarContraseña/verifyCodeController';

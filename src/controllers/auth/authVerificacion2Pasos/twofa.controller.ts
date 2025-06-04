@@ -1,7 +1,7 @@
 //controllers/authVerificacion2Pasos/twofa.controller.ts
 import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';
-import { generateToken } from '../../../src/utils/auth/generateToken';
+import { generateToken } from '../../../utils/auth/generateToken';
 const prisma = new PrismaClient();
 
 const transporter = nodemailer.createTransport({

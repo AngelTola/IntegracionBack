@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { obtenerRentersDeDriver } from "../../services/visualizarRenters.service";
+import { obtenerRentersDeDriver } from "../../../services/auth/visualizarRenters.service";
 
 export const getRentersAsignados = async (req: Request, res: Response): Promise<void> => {
   try {

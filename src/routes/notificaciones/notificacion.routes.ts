@@ -1,3 +1,4 @@
+//src/routes/notificaciones/notificacion.routes.ts
 import { Router } from 'express';
 import { NotificacionController } from '../../controllers/notificaciones/notificacion.controller';
 import { SSEController } from '../../controllers/notificaciones/sse.controller';

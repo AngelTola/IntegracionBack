@@ -1,4 +1,4 @@
-
+//src/middlewares/auth/isAuthenticated.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 

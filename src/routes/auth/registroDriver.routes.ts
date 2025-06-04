@@ -1,3 +1,4 @@
+//src/routes/auth/registroDriver.routes.ts
 import { Router } from 'express';
 import { registrarDriverController } from '../../controllers/auth/authRegistroDriver/registroDriver.controller';
 /* import { requireAuth } from '../middlewares/authMiddleware'; */

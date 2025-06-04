@@ -1,6 +1,7 @@
+//src/routes/auth/visualizarRenters.routes.ts
 import { Router } from "express";
-import { getRentersAsignados } from "../controllers/authVisualizarListaRenters/visualizarRenters.controller";
-import { authMiddleware } from "../middlewares/authMiddleware"; 
+import { getRentersAsignados } from "../../controllers/auth/authVisualizarListaRenters/visualizarRenters.controller";
+import { authMiddleware } from "../../middlewares/auth/authMiddleware"; 
 
 const router = Router();
 //Define una ruta GET en "/driver/renters"

@@ -1,4 +1,4 @@
-//
+//src/routes/auth/registroHost.routes.ts
 import express from 'express';
 import { registrarHostCompletoController } from '../../controllers/auth/authRegistroHost/registroHost.controller';
 import { requireAuth } from '../../middlewares/auth/authMiddleware';

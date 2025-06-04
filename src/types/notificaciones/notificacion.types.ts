@@ -1,3 +1,4 @@
+//src/types/
 import { PrioridadNotificacion } from "@prisma/client";
 
 // Data Transfer Object, estructura exacta para crear una nueva notificacion en el sistema

@@ -1,3 +1,4 @@
+//src/services/notificaciones/notificacion.service.ts
 import prisma from '../../config/database';
 import { NotificacionDTO, NotificacionFiltro } from '../../types/notificaciones/notificacion.types';
 import { PrioridadNotificacion } from '@prisma/client';

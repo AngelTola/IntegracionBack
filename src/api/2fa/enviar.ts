@@ -1,7 +1,7 @@
 // api/2fa/enviar.ts
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
-import { enviarCodigo2FA } from '../../controllers/authVerificacion2Pasos/twofa.controller';
+import { enviarCodigo2FA } from '../../controllers/auth/authVerificacion2Pasos/twofa.controller';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {

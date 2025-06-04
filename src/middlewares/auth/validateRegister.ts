@@ -1,3 +1,4 @@
+//src/middlewares/auth/validateRegister.ts
 import { Request, Response, NextFunction } from 'express';
 
 export const validateRegister = (req: Request, res: Response, next: NextFunction): Promise<void> => {

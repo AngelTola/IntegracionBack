@@ -1,4 +1,4 @@
-// src/routes/auth.routes.ts
+//src/routes/auth/auth.routes.ts
 import { Router } from "express";
 import { register, login, getUserProfile } from "../../controllers/auth/auth.controller"; // 👈 IMPORTA BIEN AQUÍ
 import { validateRegister } from "../../middlewares/auth/validateRegister"; // 👈 IMPORTAR middleware de validación
