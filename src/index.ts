@@ -31,6 +31,8 @@ import { NotificacionService } from "./services/notificaciones/notificacion.serv
 import { NotificacionController } from "./controllers/notificaciones/notificacion.controller";
 import { SSEController } from "./controllers/notificaciones/sse.controller";
 import { createNotificacionRoutes } from "./routes/notificaciones/notificacion.routes";
+// Servicios y controladores - SpeedCode
+import mapaRoutes from "../src/routes/speedcode/filtroMapaPrecioRoutes";
 
 // Cargar variables de entorno
 dotenv.config();
@@ -150,6 +152,10 @@ app.use("/api", visualizarRentersRoutes);
 app.use("/api", listaDriversRoutes);
 app.use("/api", twofaRoutes);
 
+// Rutas de api - SpeedCode
+app.use('/api', mapaRoutes);
+
+
 // Rutas de notificaciones
 app.use("/api/notificaciones", createNotificacionRoutes());
 
@@ -171,7 +177,7 @@ app.get("/health", (req, res) => {
 // Manejo de errores global
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("Error no manejado:", err);
-  res.status(500).json({ 
+  res.status(500).json({
     error: "Error interno del servidor",
     message: process.env.NODE_ENV === "development" ? err.message : "Algo salió mal"
   });
@@ -198,7 +204,7 @@ process.on("SIGINT", () => {
 async function startServer() {
   try {
     await ensureDefaultUbicacion();
-    
+
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`🌐 Environment: ${process.env.NODE_ENV || "development"}`);
