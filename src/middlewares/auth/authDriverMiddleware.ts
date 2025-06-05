@@ -1,11 +1,16 @@
+
 //src/middlewares/auth/authDriverMiddleware.ts
-import { Request, Response, NextFunction } from "express";
+/*import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-interface JwtPayload {
+export interface JwtPayload {
   idUsuario: number;
   email: string;
   nombreCompleto: string;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user?: JwtPayload;
 }
 
 export const authDriverMiddleware = (
@@ -28,8 +33,7 @@ export const authDriverMiddleware = (
       process.env.JWT_SECRET || "clave_secreta"
     ) as JwtPayload;
 
-    // ✅ Cast correcto para evitar error de tipos
-    (req as Request & { user?: JwtPayload }).user = {
+    (req as AuthenticatedRequest).user = {
       idUsuario: decoded.idUsuario,
       email: decoded.email,
       nombreCompleto: decoded.nombreCompleto,
@@ -39,4 +43,4 @@ export const authDriverMiddleware = (
   } catch (error) {
     res.status(403).json({ message: "Token inválido" });
   }
-};
+};*/

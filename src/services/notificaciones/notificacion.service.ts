@@ -325,7 +325,7 @@ export class NotificacionService {
                   case 'renta': {
                     // renta → reserva → auto → imágenes
                     const renta = await prisma.renta.findUnique({
-                      where: { idRenta: idEnt },
+                      where: { id: idEnt },
                       include: {
                         reserva: {
                           include: {
@@ -348,8 +348,8 @@ export class NotificacionService {
                   }
                   case 'calificacion': {
                     // calificacion → renta → reserva → auto → imágenes
-                    const calif = await prisma.calificacion.findUnique({
-                      where: { idCalificacion: idEnt },
+                    const calif = await prisma.calificacionUsuario.findUnique({
+                      where: { idCalificacion: parseInt(idEnt) },
                       include: {
                         renta: {
                           include: {
@@ -417,7 +417,7 @@ export class NotificacionService {
                     case 'renta': {
                         // renta → reserva → auto → imágenes
                         const renta = await prisma.renta.findUnique({
-                            where: { idRenta: idEnt },
+                            where: { id: idEnt },
                             include: {
                                 reserva: {
                                     include: {
@@ -440,8 +440,8 @@ export class NotificacionService {
                     }
                     case 'calificacion': {
                         // calificacion → renta → reserva → auto → imágenes
-                        const calif = await prisma.calificacion.findUnique({
-                            where: { idCalificacion: idEnt },
+                        const calif = await prisma.calificacionUsuario.findUnique({
+                            where: { idCalificacion: parseInt(idEnt) },
                             include: {
                                 renta: {
                                     include: {

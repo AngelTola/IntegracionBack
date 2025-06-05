@@ -18,7 +18,7 @@ import authRoutes from "./routes/auth/auth.routes";
 import authRegistroHostRoutes from "./routes/auth/registroHost.routes";
 import authRegistroDriverRoutes from "./routes/auth/registroDriver.routes";
 import usuarioRoutes from "./routes/auth/usuario.routes";
-import visualizarDriverRoutes from "./routes/auth/visualizarDriver.routes";
+//import visualizarDriverRoutes from "./routes/auth/visualizarDriver.routes";
 import listaDriversRoutes from "./routes/auth/listaDrivers.routes";
 import visualizarRentersRoutes from "./routes/auth/visualizarRenters.routes";
 
@@ -32,7 +32,8 @@ import { NotificacionController } from "./controllers/notificaciones/notificacio
 import { SSEController } from "./controllers/notificaciones/sse.controller";
 import { createNotificacionRoutes } from "./routes/notificaciones/notificacion.routes";
 // Servicios y controladores - SpeedCode
-import mapaRoutes from "../src/routes/speedcode/filtroMapaPrecioRoutes";
+//import mapaRoutes from "../src/routes/speedcode/filtroMapaPrecioRoutes";
+import mapaRoutes from "./routes/speedcode/filtroMapaPrecioRoutes";
 
 // Cargar variables de entorno
 dotenv.config();
@@ -147,7 +148,7 @@ app.use("/api", passwordRoutes);
 app.use("/api", authRegistroHostRoutes);
 app.use("/api", authRegistroDriverRoutes);
 app.use("/api", usuarioRoutes);
-app.use("/api", visualizarDriverRoutes);
+//app.use("/api", visualizarDriverRoutes);
 app.use("/api", visualizarRentersRoutes);
 app.use("/api", listaDriversRoutes);
 app.use("/api", twofaRoutes);

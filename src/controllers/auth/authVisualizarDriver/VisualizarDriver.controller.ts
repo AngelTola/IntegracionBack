@@ -1,4 +1,4 @@
-import { Response, NextFunction } from "express";
+/*import { Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthenticatedRequest } from "../../../middlewares/auth/authDriverMiddleware"; // 👈 Asegúrate de usar la ruta correcta
 
@@ -32,4 +32,4 @@ export const getDriverProfile = async (
     console.error("Error al obtener perfil del driver:", error);
     res.status(500).json({ message: "Error del servidor" });
   }
-};
+};*/

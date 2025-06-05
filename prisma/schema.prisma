@@ -54,7 +54,7 @@ model Usuario {
   driverReferente  Driver? @relation("DriverToRenters", fields: [assignedToDriver], references: [idDriver])
 
   // Rentas como cliente
-  //rentas                Renta[]
+  rentas                Renta[] @relation("UsuarioRentas")
 
   metodoPago            MetodoPago?
   numeroTarjeta         String?                @db.VarChar(16)
@@ -183,7 +183,7 @@ model Auto {
   totalComentarios     Int             @default(0)
   reservas             Reserva[]
   disponibilidad       Disponibilidad[]
-  //rentas               Renta[]            // Agregada relación con Renta
+  rentas               Renta[]         @relation("AutoRentas")    // Agregada relación con Renta
 
   tipo        	          String             
   año                     Int
@@ -243,11 +243,9 @@ model Reserva {
   kilometrajeFinal  Int?
   comentario        Comentario?
   calificacionUsuario CalificacionUsuario?
-  /*montoTotal        Decimal            @db.Decimal(10, 2) 
-  pagos             Pago[]
-  garantia          Garantia?      
+  montoTotal        Decimal            @db.Decimal(10, 2)      
   estaPagada        Boolean            @default(false)
-  renta             Renta?*/
+  renta             Renta?
 
   @@map("reservas")
 }
@@ -335,14 +333,17 @@ model CalificacionUsuario {
   idReserva         Int                @unique          
   reserva           Reserva            @relation(fields: [idReserva], references: [idReserva])
   tipoCalificacion  TipoCalificacionUsuario
+  rentaId       String   @unique 
+  renta         Renta    @relation(fields: [rentaId], references: [id], onDelete: Cascade)
+
   
   @@index([idCalificado])
   @@index([idCalificador])  
   @@map("calificaciones_usuarios")
 }
 
-/*model Renta {
-  idRenta            String      @id @default(uuid())
+model Renta {
+  id                 String      @id @default(uuid())
   fechaInicio        DateTime
   fechaFin           DateTime
   montoTotal         Decimal     @db.Decimal(10, 2)
@@ -350,19 +351,16 @@ model CalificacionUsuario {
   kilometrajeFinal   Int?
   estatus            EstadoRenta @default(EN_CURSO)
   fechaAprobacion    DateTime
-  idReserva          Int         @unique  // Cambiado de String a Int
-  reserva            Reserva     @relation(fields: [idReserva], references: [idReserva], onDelete: Cascade)
-  clienteId          Int         
-  cliente            Usuario     @relation(fields: [clienteId], references: [idUsuario], onDelete: Cascade)
-  idAuto             Int         
-  auto               Auto        @relation(fields: [idAuto], references: [idAuto], onDelete: Cascade)
-  
-  // Relación con calificación
-  //calificacion       Calificacion?
+  reservaId          Int      @unique
+  reserva            Reserva     @relation(fields: [reservaId], references: [idReserva], onDelete: Cascade)
+  clienteId          Int
+  cliente            Usuario     @relation("UsuarioRentas", fields: [clienteId], references: [idUsuario], onDelete: Cascade)
+  autoId             Int
+  auto               Auto        @relation("AutoRentas", fields: [autoId], references: [idAuto], onDelete: Cascade)
+  calificacion       CalificacionUsuario?
 
-  @@index([idRenta])
-  @@index([idReserva])
-}*/
+  @@index([reservaId])
+}
 
 enum TipoCalificacionUsuario {
   ARRENDADOR    
@@ -469,4 +467,4 @@ enum EstadoRenta {
   EN_CURSO
   FINALIZADA
   CANCELADA
-}
+}//
