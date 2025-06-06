@@ -35,6 +35,9 @@ import { createNotificacionRoutes } from "./routes/notificaciones/notificacion.r
 //import mapaRoutes from "../src/routes/speedcode/filtroMapaPrecioRoutes";
 import mapaRoutes from "./routes/speedcode/filtroMapaPrecioRoutes";
 
+// QA-Tastic
+import autoRoutes from "../src/routes/qantastic/auto.routes";
+
 // Cargar variables de entorno
 dotenv.config();
 
@@ -155,6 +158,9 @@ app.use("/api", twofaRoutes);
 
 // Rutas de api - SpeedCode
 app.use('/api', mapaRoutes);
+
+// Rutas de api - QA-nTastic
+app.use('/api', autoRoutes);
 
 
 // Rutas de notificaciones
